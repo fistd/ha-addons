@@ -400,7 +400,6 @@ def index():
     (function () {
       var tabs = document.querySelectorAll('[data-auth-tab]');
       var forms = document.querySelectorAll('[data-auth-form]');
-      if (!tabs.length || !forms.length) return;
       function setMode(mode) {
         tabs.forEach(function (t) {
           t.classList.toggle('active', t.getAttribute('data-auth-tab') === mode);
@@ -414,6 +413,62 @@ def index():
           setMode(tab.getAttribute('data-auth-tab'));
         });
       });
+
+      // Home Assistant ingress can run in iframe where CSS vars are not always inherited.
+      // Sync theme vars from parent so addon always follows HA Light/Dark toggle.
+      var THEME_VARS = [
+        '--primary-background-color',
+        '--secondary-background-color',
+        '--card-background-color',
+        '--divider-color',
+        '--primary-text-color',
+        '--secondary-text-color',
+        '--primary-color',
+        '--text-primary-color',
+        '--success-color',
+        '--error-color'
+      ];
+
+      function firstNonEmptyVar(el, name) {
+        if (!el) return '';
+        var v = getComputedStyle(el).getPropertyValue(name);
+        return (v || '').trim();
+      }
+
+      function resolveThemeSource(doc) {
+        if (!doc) return null;
+        var candidates = [
+          doc.querySelector('home-assistant'),
+          doc.documentElement,
+          doc.body
+        ];
+        for (var i = 0; i < candidates.length; i++) {
+          var el = candidates[i];
+          if (!el) continue;
+          var probe = firstNonEmptyVar(el, '--primary-background-color');
+          if (probe) return el;
+        }
+        return doc.documentElement || null;
+      }
+
+      function syncThemeFromParent() {
+        try {
+          var pdoc = window.parent && window.parent.document ? window.parent.document : document;
+          var src = resolveThemeSource(pdoc);
+          if (!src) return;
+          THEME_VARS.forEach(function (name) {
+            var val = firstNonEmptyVar(src, name);
+            if (val) {
+              document.documentElement.style.setProperty(name, val);
+            }
+          });
+        } catch (e) {
+          // Fallback to local variables when parent document is inaccessible.
+        }
+      }
+
+      syncThemeFromParent();
+      setInterval(syncThemeFromParent, 1000);
     })();
   </script>
 </body>

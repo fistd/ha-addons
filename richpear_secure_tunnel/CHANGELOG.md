@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.9
+
+- Fixed HA theme sync in ingress iframe: addon now actively reads Home Assistant theme variables from parent and updates live.
+- Light/Dark mode now follows HA theme toggle even when browser/OS theme differs.
+
 ## 0.2.8
 
 - Fixed theme switching to follow Home Assistant Light/Dark mode directly (uses HA CSS theme variables instead of OS color scheme).
