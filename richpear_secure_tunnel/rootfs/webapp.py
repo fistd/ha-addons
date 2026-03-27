@@ -127,48 +127,26 @@ def index():
   <title>RichPear Tunnel Setup</title>
   <style>
     :root {
-      color-scheme: light dark;
-      --bg-main: #fafbfa;
-      --bg-soft: #f2f5f3;
-      --card: #ffffff;
-      --line: #dde4e0;
-      --text: #062910;
-      --muted: #687a70;
-      --primary: #004d29;
-      --primary-ink: #ffffff;
-      --ok: #2aa766;
-      --ok-bg: #e8f7ef;
-      --ok-line: #bfe7cf;
-      --warn: #b1222b;
-      --warn-bg: #fdecef;
-      --warn-line: #f3c7d2;
-      --input-bg: #ffffff;
-      --input-text: #062910;
-      --input-line: #d6e0db;
-      --focus-glow: rgba(0,77,41,.12);
+      /* Directly bind to Home Assistant theme variables (updates with HA Light/Dark toggle). */
+      --bg-main: var(--primary-background-color, #fafbfa);
+      --bg-soft: var(--secondary-background-color, #f2f5f3);
+      --card: var(--card-background-color, #ffffff);
+      --line: var(--divider-color, #dde4e0);
+      --text: var(--primary-text-color, #062910);
+      --muted: var(--secondary-text-color, #687a70);
+      --primary: var(--primary-color, #004d29);
+      --primary-ink: var(--text-primary-color, #ffffff);
+      --ok: var(--success-color, #2aa766);
+      --ok-bg: color-mix(in srgb, var(--ok) 18%, var(--card) 82%);
+      --ok-line: color-mix(in srgb, var(--ok) 36%, var(--line) 64%);
+      --warn: var(--error-color, #b1222b);
+      --warn-bg: color-mix(in srgb, var(--warn) 15%, var(--card) 85%);
+      --warn-line: color-mix(in srgb, var(--warn) 34%, var(--line) 66%);
+      --input-bg: color-mix(in srgb, var(--card) 92%, var(--bg-soft) 8%);
+      --input-text: var(--text);
+      --input-line: color-mix(in srgb, var(--line) 86%, var(--text) 14%);
+      --focus-glow: color-mix(in srgb, var(--primary) 22%, transparent);
       --radius: 14px;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-main: #0f1512;
-        --bg-soft: #111a16;
-        --card: #16201b;
-        --line: #26352d;
-        --text: #e6efe9;
-        --muted: #9db0a4;
-        --primary: #2d9b67;
-        --primary-ink: #ffffff;
-        --ok: #36b978;
-        --ok-bg: #153126;
-        --ok-line: #2f5945;
-        --warn: #d46372;
-        --warn-bg: #321920;
-        --warn-line: #5e2c37;
-        --input-bg: #0f1713;
-        --input-text: #e6efe9;
-        --input-line: #2d4036;
-        --focus-glow: rgba(45,155,103,.18);
-      }
     }
     * { box-sizing: border-box; }
     body {

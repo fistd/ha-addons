@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.8
+
+- Fixed theme switching to follow Home Assistant Light/Dark mode directly (uses HA CSS theme variables instead of OS color scheme).
+- Add-on colors now react immediately when HA theme is changed.
+
 ## 0.2.7
 
 - Improved dark mode readability: dark input fields, dark input borders and softer focus glow in HA dark theme.
