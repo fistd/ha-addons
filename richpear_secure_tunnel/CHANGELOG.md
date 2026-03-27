@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3
+
+- Redesigned onboarding auth section to a single clean panel with tabs (Prihlaseni/Registrace).
+- Removed side-by-side login/signup forms for a clearer client-dashboard-like flow.
+- Minor visual polish for section headings and spacing.
+
 ## 0.2.2
 
 - Unified add-on onboarding UI with the new RichPear admin visual style (cards, typography, forms, status badges).

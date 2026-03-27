@@ -230,14 +230,40 @@ def index():
       line-height: 1.25;
     }
     .muted { color: var(--muted); font-size: 13px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .box {
+    .auth-wrap {
+      max-width: 520px;
       border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 12px;
+      border-radius: 12px;
       background: #fbfdf9;
+      padding: 14px;
     }
-    .box h4 { margin: 0 0 8px; font-size: 14px; }
+    .auth-tabs {
+      display: inline-flex;
+      gap: 6px;
+      background: #edf3e9;
+      border: 1px solid #d8e5cf;
+      border-radius: 999px;
+      padding: 4px;
+      margin-bottom: 10px;
+    }
+    .auth-tab {
+      border: 0;
+      background: transparent;
+      color: #425f4d;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+    .auth-tab.active {
+      background: #ffffff;
+      color: #1f6fff;
+      box-shadow: 0 2px 8px rgba(20, 40, 27, 0.10);
+    }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+    .auth-title { margin: 0 0 8px; font-size: 14px; color: #234032; font-weight: 700; }
     .row { margin-bottom: 10px; }
     input {
       width: 100%;
@@ -283,7 +309,6 @@ def index():
       border-radius: 8px;
       padding: 4px 8px;
     }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
     @media (max-width: 520px) { .meta { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -321,29 +346,33 @@ def index():
     {% if flash_err %}<div class="flash err">{{ flash_err }}</div>{% endif %}
 
     <section class="panel">
-      <h3>1) Ucet zakaznika</h3>
+      <h3>Ucet zakaznika</h3>
       {% if is_logged %}
       <div class="flash ok">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status","-") }})</div>
       {% else %}
-      <div class="grid">
-        <form method="post" action="signup" class="box">
-          <h4>Nemam ucet</h4>
-          <div class="row"><input name="email" type="email" placeholder="E-mail" required /></div>
-          <div class="row"><input name="password" type="password" placeholder="Heslo (min 10, pismena + cisla)" required /></div>
-          <button type="submit" class="btn">Registrovat</button>
-        </form>
-        <form method="post" action="login" class="box">
-          <h4>Uz mam ucet</h4>
+      <div class="auth-wrap">
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab active" data-auth-tab="login">Prihlaseni</button>
+          <button type="button" class="auth-tab" data-auth-tab="signup">Registrace</button>
+        </div>
+        <form method="post" action="login" class="auth-form active" data-auth-form="login">
+          <p class="auth-title">Prihlas se do existujiciho uctu</p>
           <div class="row"><input name="email" type="email" placeholder="E-mail" required /></div>
           <div class="row"><input name="password" type="password" placeholder="Heslo" required /></div>
           <button type="submit" class="btn">Prihlasit</button>
+        </form>
+        <form method="post" action="signup" class="auth-form" data-auth-form="signup">
+          <p class="auth-title">Vytvor novy ucet</p>
+          <div class="row"><input name="email" type="email" placeholder="E-mail" required /></div>
+          <div class="row"><input name="password" type="password" placeholder="Heslo (min 10, pismena + cisla)" required /></div>
+          <button type="submit" class="btn">Registrovat</button>
         </form>
       </div>
       {% endif %}
     </section>
 
     <section class="panel">
-      <h3>2) Subdomena a pripojeni</h3>
+      <h3>Subdomena a pripojeni</h3>
       <form method="post" action="connect">
         <div class="row-inline" style="margin-bottom:10px;">
           <input style="flex:1; min-width:220px;" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
@@ -359,6 +388,26 @@ def index():
       </form>
     </section>
   </div>
+  <script>
+    (function () {
+      var tabs = document.querySelectorAll('[data-auth-tab]');
+      var forms = document.querySelectorAll('[data-auth-form]');
+      if (!tabs.length || !forms.length) return;
+      function setMode(mode) {
+        tabs.forEach(function (t) {
+          t.classList.toggle('active', t.getAttribute('data-auth-tab') === mode);
+        });
+        forms.forEach(function (f) {
+          f.classList.toggle('active', f.getAttribute('data-auth-form') === mode);
+        });
+      }
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          setMode(tab.getAttribute('data-auth-tab'));
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
         """,
