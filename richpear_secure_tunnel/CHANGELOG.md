@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- Fixed Home Assistant ingress 404 after signup/login/connect (ingress-aware redirects and relative form actions).
+- Improved onboarding flow to explicit 2 steps: account (signup/login) then subdomain connect.
+- Improved UI clarity and status visibility.
+
 ## 0.2.0
 
 - Added built-in onboarding web UI in add-on ingress (signup/login/connect subdomain).

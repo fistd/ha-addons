@@ -4,6 +4,7 @@ import os
 import subprocess
 import urllib.error
 import urllib.request
+import urllib.parse
 from pathlib import Path
 
 from flask import Flask, redirect, render_template_string, request, url_for
@@ -93,9 +94,29 @@ def frpc_running() -> bool:
     return result.returncode == 0 and bool(result.stdout.strip())
 
 
+def ingress_path() -> str:
+    base = request.headers.get("X-Ingress-Path", "").strip()
+    if not base:
+        return ""
+    if not base.startswith("/"):
+        base = f"/{base}"
+    return base.rstrip("/")
+
+
+def ingress_redirect(ok: str = "", err: str = ""):
+    base = ingress_path()
+    query = ""
+    if ok:
+        query = "?ok=" + urllib.parse.quote_plus(ok)
+    elif err:
+        query = "?err=" + urllib.parse.quote_plus(err)
+    return redirect(f"{base}/{query}" if base else f"/{query}")
+
+
 @APP.get("/")
 def index():
     state = load_state()
+    is_logged = bool(state.get("access_token"))
     return render_template_string(
         """
 <!doctype html>
@@ -105,16 +126,23 @@ def index():
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Richpear Tunnel Onboarding</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#f6f8fb; margin:0; }
-    .wrap { max-width: 720px; margin: 24px auto; background:#fff; border-radius: 12px; padding: 20px; box-shadow:0 8px 24px rgba(0,0,0,.08);}
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:linear-gradient(180deg,#f2f6ff,#edf5f2); margin:0; }
+    .wrap { max-width: 760px; margin: 22px auto; background:#fff; border-radius: 14px; padding: 22px; box-shadow:0 12px 30px rgba(16,30,70,.10);}
     h1 { margin-top: 0; }
     .row { margin-bottom: 14px; }
     input { width:100%; box-sizing: border-box; padding: 10px; border:1px solid #ccd3de; border-radius: 8px; }
-    button { background:#0d6efd; color:#fff; border:0; border-radius: 8px; padding: 10px 14px; cursor:pointer; }
+    button { background:#145af2; color:#fff; border:0; border-radius: 8px; padding: 10px 14px; cursor:pointer; }
+    button.secondary { background:#4b5565; }
+    button.ok { background:#198754; }
     .hint { color:#58667a; font-size: 14px; }
     .ok { background:#e8f7ee; border:1px solid #b8e3c7; color:#114d27; padding:10px; border-radius:8px; }
     .err { background:#fdecec; border:1px solid #f5c2c2; color:#7f1d1d; padding:10px; border-radius:8px; }
     .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    .cardline { border:1px solid #dbe5f3; border-radius:10px; padding:14px; margin-top:14px; }
+    .badge { display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; font-weight:600; }
+    .b-ok { background:#e9f7ef; color:#146c43; border:1px solid #bfe7cf; }
+    .b-off { background:#f8eaed; color:#9f1239; border:1px solid #f3c7d2; }
+    .muted-small { color:#6b778d; font-size:13px; }
     @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -123,31 +151,50 @@ def index():
     <h1>Richpear Secure Tunnel</h1>
     <p class="hint">Device ID: {{ device_id }}</p>
     <p class="hint">Control plane: {{ control_plane_url }}</p>
-    <p class="hint">Tunnel status: <strong>{{ "running" if frpc_up else "stopped" }}</strong></p>
+    <p class="hint">Tunnel:
+      {% if frpc_up %}<span class="badge b-ok">running</span>{% else %}<span class="badge b-off">stopped</span>{% endif %}
+    </p>
+    {% if state.get("full_domain") %}
+    <p class="hint">Aktivni domena: <strong>https://{{ state.get("full_domain") }}</strong></p>
+    {% endif %}
     {% if flash_ok %}<div class="ok">{{ flash_ok }}</div>{% endif %}
     {% if flash_err %}<div class="err">{{ flash_err }}</div>{% endif %}
-    <div class="grid">
-      <form method="post" action="/signup">
-        <h3>1) Registrace</h3>
-        <div class="row"><input name="email" type="email" placeholder="E-mail" required /></div>
-        <div class="row"><input name="password" type="password" placeholder="Heslo (min 8)" required /></div>
-        <button type="submit">Vytvorit ucet</button>
+
+    <div class="cardline">
+      <h3 style="margin-top:0;">1) Ucet</h3>
+      {% if is_logged %}
+      <div class="ok">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status","-") }})</div>
+      {% else %}
+      <div class="grid">
+        <form method="post" action="signup">
+          <div class="muted-small" style="margin-bottom:8px;">Nemam ucet</div>
+          <div class="row"><input name="email" type="email" placeholder="E-mail" required /></div>
+          <div class="row"><input name="password" type="password" placeholder="Heslo (min 8)" required /></div>
+          <button type="submit">Registrovat</button>
+        </form>
+        <form method="post" action="login">
+          <div class="muted-small" style="margin-bottom:8px;">Uz mam ucet</div>
+          <div class="row"><input name="email" type="email" placeholder="E-mail" required /></div>
+          <div class="row"><input name="password" type="password" placeholder="Heslo" required /></div>
+          <button type="submit">Prihlasit</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="cardline">
+      <h3 style="margin-top:0;">2) Subdomena a pripojeni</h3>
+      <form method="post" action="connect">
+        <div class="row"><input name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} /></div>
+        <button type="submit" class="ok" {% if not is_logged %}disabled{% endif %}>Pripojit tunel</button>
       </form>
-      <form method="post" action="/login">
-        <h3>2) Prihlaseni</h3>
-        <div class="row"><input name="email" type="email" placeholder="E-mail" required /></div>
-        <div class="row"><input name="password" type="password" placeholder="Heslo" required /></div>
-        <button type="submit">Prihlasit</button>
+      {% if not is_logged %}
+      <p class="muted-small">Nejdriv se registruj nebo prihlas.</p>
+      {% endif %}
+      <form method="post" action="restart" style="margin-top:10px;">
+        <button type="submit" class="secondary">Restart tunelu</button>
       </form>
     </div>
-    <form method="post" action="/connect" style="margin-top:16px;">
-      <h3>3) Pripojeni zarizeni a subdomena</h3>
-      <div class="row"><input name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required /></div>
-      <button type="submit">Pripojit tunel</button>
-    </form>
-    <form method="post" action="/restart" style="margin-top:10px;">
-      <button type="submit">Restart tunelu</button>
-    </form>
   </div>
 </body>
 </html>
@@ -156,6 +203,7 @@ def index():
         control_plane_url=CONTROL_PLANE_URL,
         device_id=load_device_id(),
         frpc_up=frpc_running(),
+        is_logged=is_logged,
         flash_ok=request.args.get("ok", ""),
         flash_err=request.args.get("err", ""),
     )
@@ -167,13 +215,13 @@ def signup():
     password = request.form.get("password", "")
     code, data = api_post("/api/v2/public/signup", {"email": email, "password": password})
     if code != 200:
-        return redirect(url_for("index", err=data.get("detail", f"Signup failed ({code})")))
+        return ingress_redirect(err=data.get("detail", f"Signup failed ({code})"))
     state = load_state()
     state["email"] = data.get("email", email)
     state["access_token"] = data.get("access_token", "")
     state["plan_status"] = data.get("plan_status", "trial")
     save_state(state)
-    return redirect(url_for("index", ok="Ucet vytvoren a prihlasen"))
+    return ingress_redirect(ok="Ucet vytvoren a prihlasen")
 
 
 @APP.post("/login")
@@ -182,13 +230,13 @@ def login():
     password = request.form.get("password", "")
     code, data = api_post("/api/v2/public/login", {"email": email, "password": password})
     if code != 200:
-        return redirect(url_for("index", err=data.get("detail", f"Login failed ({code})")))
+        return ingress_redirect(err=data.get("detail", f"Login failed ({code})"))
     state = load_state()
     state["email"] = data.get("email", email)
     state["access_token"] = data.get("access_token", "")
     state["plan_status"] = data.get("plan_status", "trial")
     save_state(state)
-    return redirect(url_for("index", ok="Prihlaseni probehlo uspesne"))
+    return ingress_redirect(ok="Prihlaseni probehlo uspesne")
 
 
 @APP.post("/connect")
@@ -197,7 +245,7 @@ def connect():
     state = load_state()
     token = state.get("access_token", "")
     if not token:
-        return redirect(url_for("index", err="Nejdriv se prihlas nebo zaregistruj"))
+        return ingress_redirect(err="Nejdriv se prihlas nebo zaregistruj")
     payload = {
         "device_id": load_device_id(),
         "subdomain": subdomain,
@@ -205,7 +253,7 @@ def connect():
     }
     code, data = api_post("/api/v2/public/devices/claim", payload, bearer_token=token)
     if code != 200:
-        return redirect(url_for("index", err=data.get("detail", f"Connect failed ({code})")))
+        return ingress_redirect(err=data.get("detail", f"Connect failed ({code})"))
 
     write_frpc_config(
         subdomain=subdomain,
@@ -217,15 +265,15 @@ def connect():
     state["subdomain"] = subdomain
     state["full_domain"] = data.get("full_domain", "")
     save_state(state)
-    return redirect(url_for("index", ok=f"Tunel aktivni: {state.get('full_domain','')}"))
+    return ingress_redirect(ok=f"Tunel aktivni: {state.get('full_domain','')}")
 
 
 @APP.post("/restart")
 def restart():
     if Path(FRPC_CONFIG).exists():
         restart_frpc()
-        return redirect(url_for("index", ok="Tunel restartovan"))
-    return redirect(url_for("index", err="Konfigurace tunelu zatim neexistuje"))
+        return ingress_redirect(ok="Tunel restartovan")
+    return ingress_redirect(err="Konfigurace tunelu zatim neexistuje")
 
 
 if __name__ == "__main__":
