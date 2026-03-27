@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.5
+
+- Aligned add-on colors to the same green palette used in the current RichPear client/admin frontend.
+- Preserved clean single auth panel (Prihlaseni/Registrace tabs) and unified card styling.
+
 ## 0.2.4
 
 - Refined add-on UI to better match the Client Portal visual language (lighter dashboard cards, blue primary accents, cleaner spacing).

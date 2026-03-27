@@ -127,15 +127,15 @@ def index():
   <title>RichPear Tunnel Setup</title>
   <style>
     :root {
-      --bg-main: #f4f7fc;
-      --bg-soft: #eef3fb;
+      --bg-main: #fafbfa;
+      --bg-soft: #f2f5f3;
       --card: #ffffff;
-      --line: #dbe5f4;
-      --text: #16253d;
-      --muted: #60718e;
-      --primary: #246bff;
+      --line: #dde4e0;
+      --text: #062910;
+      --muted: #687a70;
+      --primary: #004d29;
       --primary-ink: #ffffff;
-      --ok: #1f8a4c;
+      --ok: #2aa766;
       --ok-bg: #e8f7ef;
       --ok-line: #bfe7cf;
       --warn: #b1222b;
@@ -149,8 +149,8 @@ def index():
       font-family: "Segoe UI", "Noto Sans", system-ui, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 8% 10%, rgba(36, 107, 255, 0.09), transparent 36%),
-        radial-gradient(circle at 88% 88%, rgba(98, 128, 182, 0.08), transparent 32%),
+        radial-gradient(circle at 8% 10%, rgba(0, 77, 41, 0.08), transparent 36%),
+        radial-gradient(circle at 88% 88%, rgba(20, 71, 43, 0.06), transparent 32%),
         linear-gradient(165deg, var(--bg-main), var(--bg-soft));
       min-height: 100vh;
     }
@@ -160,11 +160,11 @@ def index():
       padding: 0 14px;
     }
     .hero {
-      background: linear-gradient(150deg, #ffffff, #f4f8ff);
+      background: linear-gradient(150deg, #ffffff, #f5faf7);
       color: var(--text);
       border-radius: 16px;
       border: 1px solid var(--line);
-      box-shadow: 0 12px 28px rgba(20, 40, 70, 0.08);
+      box-shadow: 0 12px 28px rgba(10, 38, 22, 0.08);
       padding: 20px;
       margin-bottom: 14px;
     }
@@ -175,11 +175,13 @@ def index():
       width: 34px;
       height: 34px;
       border-radius: 9px;
-      background: var(--primary);
+      background: #ffffff;
+      border: 1px solid #dce9e2;
       color: #ffffff;
       font-weight: 800;
       margin-right: 10px;
       font-size: 13px;
+      color: var(--primary);
     }
     .hero h1 { margin: 0 0 6px; font-size: 26px; line-height: 1.2; }
     .hero p { margin: 0; color: var(--muted); font-size: 14px; }
@@ -190,7 +192,7 @@ def index():
       margin-top: 14px;
     }
     .meta-item {
-      background: #ffffff;
+      background: #fcfdfc;
       border: 1px solid var(--line);
       border-radius: 10px;
       padding: 10px 12px;
@@ -220,7 +222,7 @@ def index():
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      box-shadow: 0 10px 24px rgba(20, 40, 70, 0.07);
+      box-shadow: 0 10px 24px rgba(12, 42, 24, 0.07);
       padding: 16px;
       margin-top: 14px;
     }
@@ -234,14 +236,14 @@ def index():
       max-width: 520px;
       border: 1px solid var(--line);
       border-radius: 12px;
-      background: #f9fbff;
+      background: #fafcfb;
       padding: 14px;
     }
     .auth-tabs {
       display: inline-flex;
       gap: 6px;
-      background: #ecf2ff;
-      border: 1px solid #d7e3fb;
+      background: #edf3ef;
+      border: 1px solid #d9e6de;
       border-radius: 999px;
       padding: 4px;
       margin-bottom: 10px;
@@ -249,7 +251,7 @@ def index():
     .auth-tab {
       border: 0;
       background: transparent;
-      color: #5973a1;
+      color: #4f6859;
       font-size: 13px;
       font-weight: 700;
       border-radius: 999px;
@@ -258,16 +260,16 @@ def index():
     }
     .auth-tab.active {
       background: #ffffff;
-      color: #1f6fff;
-      box-shadow: 0 2px 8px rgba(22, 45, 90, 0.10);
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(12, 42, 24, 0.10);
     }
     .auth-form { display: none; }
     .auth-form.active { display: block; }
-    .auth-title { margin: 0 0 8px; font-size: 14px; color: #26406a; font-weight: 700; }
+    .auth-title { margin: 0 0 8px; font-size: 14px; color: #1f4a2d; font-weight: 700; }
     .row { margin-bottom: 10px; }
     input {
       width: 100%;
-      border: 1px solid #cddbf4;
+      border: 1px solid #d4e0d9;
       border-radius: 10px;
       padding: 11px 12px;
       font-size: 14px;
@@ -277,8 +279,8 @@ def index():
       color: var(--text);
     }
     input:focus {
-      border-color: #6ea6ff;
-      box-shadow: 0 0 0 4px rgba(31,111,255,.13);
+      border-color: #5f9d7b;
+      box-shadow: 0 0 0 4px rgba(0,77,41,.12);
     }
     .btn {
       border: 0;
@@ -302,10 +304,10 @@ def index():
     }
     .row-inline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .domain {
-      color: #2855ad;
+      color: var(--primary);
       font-weight: 700;
-      background: #edf3ff;
-      border: 1px solid #d7e4ff;
+      background: #edf4f0;
+      border: 1px solid #d7e5dd;
       border-radius: 8px;
       padding: 4px 8px;
     }
