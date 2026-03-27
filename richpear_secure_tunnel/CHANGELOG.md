@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4
+
+- Refined add-on UI to better match the Client Portal visual language (lighter dashboard cards, blue primary accents, cleaner spacing).
+- Kept single auth panel with Prihlaseni/Registrace tabs and one visible form at a time.
+- Improved overall readability and consistency of status cards and subdomain row.
+
 ## 0.2.3
 
 - Redesigned onboarding auth section to a single clean panel with tabs (Prihlaseni/Registrace).

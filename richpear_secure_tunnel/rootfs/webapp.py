@@ -127,18 +127,18 @@ def index():
   <title>RichPear Tunnel Setup</title>
   <style>
     :root {
-      --bg-main: #f5f9f1;
-      --bg-soft: #eef6e8;
+      --bg-main: #f4f7fc;
+      --bg-soft: #eef3fb;
       --card: #ffffff;
-      --line: #d6e5cd;
-      --text: #17301c;
-      --muted: #51695a;
-      --primary: #1f6fff;
+      --line: #dbe5f4;
+      --text: #16253d;
+      --muted: #60718e;
+      --primary: #246bff;
       --primary-ink: #ffffff;
-      --ok: #198754;
-      --ok-bg: #e9f7ef;
+      --ok: #1f8a4c;
+      --ok-bg: #e8f7ef;
       --ok-line: #bfe7cf;
-      --warn: #9f1239;
+      --warn: #b1222b;
       --warn-bg: #fdecef;
       --warn-line: #f3c7d2;
       --radius: 14px;
@@ -149,8 +149,8 @@ def index():
       font-family: "Segoe UI", "Noto Sans", system-ui, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 8% 10%, rgba(87, 177, 110, 0.10), transparent 36%),
-        radial-gradient(circle at 88% 88%, rgba(31, 111, 255, 0.08), transparent 32%),
+        radial-gradient(circle at 8% 10%, rgba(36, 107, 255, 0.09), transparent 36%),
+        radial-gradient(circle at 88% 88%, rgba(98, 128, 182, 0.08), transparent 32%),
         linear-gradient(165deg, var(--bg-main), var(--bg-soft));
       min-height: 100vh;
     }
@@ -160,11 +160,11 @@ def index():
       padding: 0 14px;
     }
     .hero {
-      background: linear-gradient(125deg, #173d20, #245f31);
-      color: #f3fff0;
+      background: linear-gradient(150deg, #ffffff, #f4f8ff);
+      color: var(--text);
       border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.18);
-      box-shadow: 0 20px 44px rgba(22, 57, 33, 0.22);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 28px rgba(20, 40, 70, 0.08);
       padding: 20px;
       margin-bottom: 14px;
     }
@@ -175,14 +175,14 @@ def index():
       width: 34px;
       height: 34px;
       border-radius: 9px;
-      background: #ffffff;
-      color: #12351b;
+      background: var(--primary);
+      color: #ffffff;
       font-weight: 800;
       margin-right: 10px;
       font-size: 13px;
     }
     .hero h1 { margin: 0 0 6px; font-size: 26px; line-height: 1.2; }
-    .hero p { margin: 0; color: rgba(243,255,240,0.84); font-size: 14px; }
+    .hero p { margin: 0; color: var(--muted); font-size: 14px; }
     .meta {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -190,13 +190,13 @@ def index():
       margin-top: 14px;
     }
     .meta-item {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
+      background: #ffffff;
+      border: 1px solid var(--line);
       border-radius: 10px;
       padding: 10px 12px;
       font-size: 13px;
     }
-    .meta-label { color: rgba(243,255,240,0.76); display: block; margin-bottom: 4px; }
+    .meta-label { color: var(--muted); display: block; margin-bottom: 4px; }
     .meta-value { font-weight: 700; word-break: break-word; }
     .status-pill {
       display: inline-flex;
@@ -208,8 +208,8 @@ def index():
       font-weight: 700;
       border: 1px solid transparent;
     }
-    .up { background: #e9f7ef; color: #146c43; border-color: #bfe7cf; }
-    .down { background: #fdecef; color: #9f1239; border-color: #f3c7d2; }
+    .up { background: #e8f7ef; color: #16683d; border-color: #c7e9d5; }
+    .down { background: #fdecef; color: #a81e35; border-color: #f3c7d2; }
     .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 
     .flash { margin: 10px 0; padding: 10px 12px; border-radius: 10px; font-size: 14px; }
@@ -220,7 +220,7 @@ def index():
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      box-shadow: 0 14px 36px rgba(20, 51, 27, 0.10);
+      box-shadow: 0 10px 24px rgba(20, 40, 70, 0.07);
       padding: 16px;
       margin-top: 14px;
     }
@@ -234,14 +234,14 @@ def index():
       max-width: 520px;
       border: 1px solid var(--line);
       border-radius: 12px;
-      background: #fbfdf9;
+      background: #f9fbff;
       padding: 14px;
     }
     .auth-tabs {
       display: inline-flex;
       gap: 6px;
-      background: #edf3e9;
-      border: 1px solid #d8e5cf;
+      background: #ecf2ff;
+      border: 1px solid #d7e3fb;
       border-radius: 999px;
       padding: 4px;
       margin-bottom: 10px;
@@ -249,7 +249,7 @@ def index():
     .auth-tab {
       border: 0;
       background: transparent;
-      color: #425f4d;
+      color: #5973a1;
       font-size: 13px;
       font-weight: 700;
       border-radius: 999px;
@@ -259,15 +259,15 @@ def index():
     .auth-tab.active {
       background: #ffffff;
       color: #1f6fff;
-      box-shadow: 0 2px 8px rgba(20, 40, 27, 0.10);
+      box-shadow: 0 2px 8px rgba(22, 45, 90, 0.10);
     }
     .auth-form { display: none; }
     .auth-form.active { display: block; }
-    .auth-title { margin: 0 0 8px; font-size: 14px; color: #234032; font-weight: 700; }
+    .auth-title { margin: 0 0 8px; font-size: 14px; color: #26406a; font-weight: 700; }
     .row { margin-bottom: 10px; }
     input {
       width: 100%;
-      border: 1px solid #c8d8be;
+      border: 1px solid #cddbf4;
       border-radius: 10px;
       padding: 11px 12px;
       font-size: 14px;
@@ -294,7 +294,7 @@ def index():
     .btn:hover { filter: brightness(1.05); }
     .btn:active { transform: translateY(1px); }
     .btn.secondary { background: #5f6c84; }
-    .btn.ok { background: var(--ok); }
+    .btn.ok { background: var(--primary); }
     .btn:disabled {
       cursor: not-allowed;
       filter: grayscale(.45);
@@ -302,10 +302,10 @@ def index():
     }
     .row-inline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .domain {
-      color: #245f31;
+      color: #2855ad;
       font-weight: 700;
-      background: #eff8ea;
-      border: 1px solid #d5e9c8;
+      background: #edf3ff;
+      border: 1px solid #d7e4ff;
       border-radius: 8px;
       padding: 4px 8px;
     }
