@@ -7,10 +7,9 @@ if [ ! -f "$CONFIG_PATH" ]; then
   exit 1
 fi
 
-CONTROL_PLANE_URL=$(jq -r '.control_plane_url' "$CONFIG_PATH")
-EMAIL=$(jq -r '.email' "$CONFIG_PATH")
-SUBDOMAIN=$(jq -r '.subdomain' "$CONFIG_PATH")
-DEVICE_NAME=$(jq -r '.device_name' "$CONFIG_PATH")
+CONTROL_PLANE_URL=$(jq -r '.control_plane_url // "https://admin.cz.richpear.cz"' "$CONFIG_PATH")
+EMAIL=$(jq -r '.email // ""' "$CONFIG_PATH")
+SUBDOMAIN=$(jq -r '.subdomain // ""' "$CONFIG_PATH")
 HA_PORT=$(jq -r '.ha_port // 8123' "$CONFIG_PATH")
 UPSTREAM_HOST_HEADER=$(jq -r '.upstream_host_header // "localhost"' "$CONFIG_PATH")
 LOCAL_PROXY_PORT=18123
@@ -18,6 +17,9 @@ LOCAL_PROXY_PORT=18123
 DEVICE_ID_FILE="/data/device_id"
 KEY_FILE="/data/device_key.pem"
 PUB_FILE="/data/device_pub.pem"
+STATE_FILE="/data/onboarding_state.json"
+FRPC_CONFIG="/data/frpc.toml"
+FRPC_LOG="/data/frpc.log"
 
 [ -f "$DEVICE_ID_FILE" ] || cat /proc/sys/kernel/random/uuid > "$DEVICE_ID_FILE"
 DEVICE_ID=$(cat "$DEVICE_ID_FILE")
@@ -28,32 +30,6 @@ if [ ! -f "$KEY_FILE" ]; then
 fi
 
 PUB_KEY=$(awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' "$PUB_FILE")
-
-PAYLOAD=$(jq -n \
-  --arg device_id "$DEVICE_ID" \
-  --arg email "$EMAIL" \
-  --arg subdomain "$SUBDOMAIN" \
-  --arg public_key "$PUB_KEY" \
-  '{device_id:$device_id,email:$email,subdomain:$subdomain,public_key:$public_key}')
-
-echo "Registering $DEVICE_NAME ($DEVICE_ID) with $CONTROL_PLANE_URL"
-HTTP_CODE=$(curl -sS -o /tmp/register.json -w '%{http_code}' \
-  -X POST "$CONTROL_PLANE_URL/api/v2/devices/register" \
-  -H "Content-Type: application/json" \
-  -d "$PAYLOAD")
-
-if [ "$HTTP_CODE" != "200" ]; then
-  echo "Registration failed: HTTP $HTTP_CODE"
-  cat /tmp/register.json
-  exit 1
-fi
-
-echo "Registration succeeded"
-cat /tmp/register.json
-
-FRP_SERVER=$(jq -r '.frp_server' /tmp/register.json)
-FRP_PORT=$(jq -r '.frp_port' /tmp/register.json)
-FRP_TOKEN=$(jq -r '.frp_token' /tmp/register.json)
 
 ARCH=$(uname -m)
 case "$ARCH" in
@@ -74,8 +50,7 @@ if [ ! -x "$FRP_BIN" ]; then
   chmod +x "$FRP_BIN"
 fi
 
-# Start local reverse proxy to normalize headers for Home Assistant.
-# This avoids requiring manual trusted_proxies configuration on customer HA.
+# Local reverse proxy normalizes headers to keep HA happy without manual customer config.
 CADDYFILE="/tmp/Caddyfile"
 cat > "$CADDYFILE" <<EOF
 :${LOCAL_PROXY_PORT} {
@@ -89,11 +64,39 @@ cat > "$CADDYFILE" <<EOF
 }
 EOF
 
-echo "Starting local header-normalizing proxy on :${LOCAL_PROXY_PORT} -> 127.0.0.1:${HA_PORT}"
+echo "Starting local proxy on :${LOCAL_PROXY_PORT} -> 127.0.0.1:${HA_PORT}"
 caddy run --config "$CADDYFILE" --adapter caddyfile >/tmp/caddy.log 2>&1 &
 
-FRPC_CONFIG="/data/frpc.toml"
-cat > "$FRPC_CONFIG" <<EOF
+start_legacy_tunnel_if_configured() {
+  if [ -z "$EMAIL" ] || [ -z "$SUBDOMAIN" ]; then
+    return 0
+  fi
+
+  PAYLOAD=$(jq -n \
+    --arg device_id "$DEVICE_ID" \
+    --arg email "$EMAIL" \
+    --arg subdomain "$SUBDOMAIN" \
+    --arg public_key "$PUB_KEY" \
+    '{device_id:$device_id,email:$email,subdomain:$subdomain,public_key:$public_key}')
+
+  echo "Legacy auto-connect: registering $DEVICE_ID ($SUBDOMAIN) with $CONTROL_PLANE_URL"
+  HTTP_CODE=$(curl -sS -o /tmp/register.json -w '%{http_code}' \
+    -X POST "$CONTROL_PLANE_URL/api/v2/devices/register" \
+    -H "Content-Type: application/json" \
+    -d "$PAYLOAD")
+
+  if [ "$HTTP_CODE" != "200" ]; then
+    echo "Legacy register failed: HTTP $HTTP_CODE"
+    cat /tmp/register.json || true
+    return 0
+  fi
+
+  FRP_SERVER=$(jq -r '.frp_server' /tmp/register.json)
+  FRP_PORT=$(jq -r '.frp_port' /tmp/register.json)
+  FRP_TOKEN=$(jq -r '.frp_token' /tmp/register.json)
+  FULL_DOMAIN=$(jq -r '.full_domain' /tmp/register.json)
+
+  cat > "$FRPC_CONFIG" <<EOF
 serverAddr = "${FRP_SERVER}"
 serverPort = ${FRP_PORT}
 user = "${SUBDOMAIN}"
@@ -108,5 +111,30 @@ subdomain = "${SUBDOMAIN}"
 hostHeaderRewrite = "${UPSTREAM_HOST_HEADER}"
 EOF
 
-echo "Starting frpc tunnel for ${SUBDOMAIN}.${FRP_SERVER}"
-exec "$FRP_BIN" -c "$FRPC_CONFIG"
+  echo "Starting legacy frpc tunnel for ${FULL_DOMAIN}"
+  "$FRP_BIN" -c "$FRPC_CONFIG" >>"$FRPC_LOG" 2>&1 &
+
+  cat > "$STATE_FILE" <<EOF
+{
+  "email": "${EMAIL}",
+  "subdomain": "${SUBDOMAIN}",
+  "full_domain": "${FULL_DOMAIN}",
+  "legacy_mode": true
+}
+EOF
+}
+
+start_legacy_tunnel_if_configured
+
+export RP_CONTROL_PLANE_URL="$CONTROL_PLANE_URL"
+export RP_FRPC_BIN="$FRP_BIN"
+export RP_FRPC_CONFIG="$FRPC_CONFIG"
+export RP_FRPC_LOG="$FRPC_LOG"
+export RP_DEVICE_ID_FILE="$DEVICE_ID_FILE"
+export RP_PUBLIC_KEY_FILE="$PUB_FILE"
+export RP_STATE_FILE="$STATE_FILE"
+export RP_LOCAL_PROXY_PORT="$LOCAL_PROXY_PORT"
+export RP_UPSTREAM_HOST_HEADER="$UPSTREAM_HOST_HEADER"
+
+echo "Starting onboarding web UI on :8099"
+exec python3 /opt/richpear/webapp.py
