@@ -127,6 +127,7 @@ def index():
   <title>RichPear Tunnel Setup</title>
   <style>
     :root {
+      color-scheme: light dark;
       --bg-main: #fafbfa;
       --bg-soft: #f2f5f3;
       --card: #ffffff;
@@ -142,6 +143,24 @@ def index():
       --warn-bg: #fdecef;
       --warn-line: #f3c7d2;
       --radius: 14px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-main: #0f1512;
+        --bg-soft: #111a16;
+        --card: #16201b;
+        --line: #26352d;
+        --text: #e6efe9;
+        --muted: #9db0a4;
+        --primary: #2d9b67;
+        --primary-ink: #ffffff;
+        --ok: #36b978;
+        --ok-bg: #153126;
+        --ok-line: #2f5945;
+        --warn: #d46372;
+        --warn-bg: #321920;
+        --warn-line: #5e2c37;
+      }
     }
     * { box-sizing: border-box; }
     body {
@@ -160,7 +179,7 @@ def index():
       padding: 0 14px;
     }
     .hero {
-      background: linear-gradient(150deg, #ffffff, #f5faf7);
+      background: linear-gradient(150deg, color-mix(in srgb, var(--card) 95%, #ffffff 5%), color-mix(in srgb, var(--card) 90%, var(--bg-soft) 10%));
       color: var(--text);
       border-radius: 16px;
       border: 1px solid var(--line);
@@ -176,7 +195,7 @@ def index():
       height: 34px;
       border-radius: 9px;
       background: #ffffff;
-      border: 1px solid #dce9e2;
+      border: 1px solid var(--line);
       color: #ffffff;
       font-weight: 800;
       margin-right: 10px;
@@ -192,7 +211,7 @@ def index():
       margin-top: 14px;
     }
     .meta-item {
-      background: #fcfdfc;
+      background: color-mix(in srgb, var(--card) 92%, var(--bg-soft) 8%);
       border: 1px solid var(--line);
       border-radius: 10px;
       padding: 10px 12px;
@@ -210,8 +229,8 @@ def index():
       font-weight: 700;
       border: 1px solid transparent;
     }
-    .up { background: #e8f7ef; color: #16683d; border-color: #c7e9d5; }
-    .down { background: #fdecef; color: #a81e35; border-color: #f3c7d2; }
+    .up { background: var(--ok-bg); color: var(--ok); border-color: var(--ok-line); }
+    .down { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-line); }
     .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 
     .flash { margin: 10px 0; padding: 10px 12px; border-radius: 10px; font-size: 14px; }
@@ -236,14 +255,14 @@ def index():
       max-width: 520px;
       border: 1px solid var(--line);
       border-radius: 12px;
-      background: #fafcfb;
+      background: color-mix(in srgb, var(--card) 93%, var(--bg-soft) 7%);
       padding: 14px;
     }
     .auth-tabs {
       display: inline-flex;
       gap: 6px;
-      background: #edf3ef;
-      border: 1px solid #d9e6de;
+      background: color-mix(in srgb, var(--bg-soft) 86%, var(--card) 14%);
+      border: 1px solid var(--line);
       border-radius: 999px;
       padding: 4px;
       margin-bottom: 10px;
@@ -259,7 +278,7 @@ def index():
       cursor: pointer;
     }
     .auth-tab.active {
-      background: #ffffff;
+      background: var(--card);
       color: var(--primary);
       box-shadow: 0 2px 8px rgba(12, 42, 24, 0.10);
     }
@@ -269,7 +288,7 @@ def index():
     .row { margin-bottom: 10px; }
     input {
       width: 100%;
-      border: 1px solid #d4e0d9;
+      border: 1px solid var(--line);
       border-radius: 10px;
       padding: 11px 12px;
       font-size: 14px;
@@ -279,7 +298,7 @@ def index():
       color: var(--text);
     }
     input:focus {
-      border-color: #5f9d7b;
+      border-color: color-mix(in srgb, var(--primary) 70%, #ffffff 30%);
       box-shadow: 0 0 0 4px rgba(0,77,41,.12);
     }
     .btn {
@@ -306,8 +325,8 @@ def index():
     .domain {
       color: var(--primary);
       font-weight: 700;
-      background: #edf4f0;
-      border: 1px solid #d7e5dd;
+      background: color-mix(in srgb, var(--bg-soft) 82%, var(--card) 18%);
+      border: 1px solid var(--line);
       border-radius: 8px;
       padding: 4px 8px;
     }

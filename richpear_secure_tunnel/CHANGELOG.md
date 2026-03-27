@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.6
+
+- Fixed add-on UI theming to respect Home Assistant light/dark mode (automatic dark palette via prefers-color-scheme).
+- Unified cards, text and status colors for both modes.
+
 ## 0.2.5
 
 - Aligned add-on colors to the same green palette used in the current RichPear client/admin frontend.
