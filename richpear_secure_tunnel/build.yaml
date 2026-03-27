@@ -1,0 +1,9 @@
+build_from:
+  amd64: ghcr.io/home-assistant/amd64-base:3.20
+  aarch64: ghcr.io/home-assistant/aarch64-base:3.20
+  armv7: ghcr.io/home-assistant/armv7-base:3.20
+labels:
+  org.opencontainers.image.title: "Richpear Secure Tunnel"
+  org.opencontainers.image.description: "Secure outbound tunnel registration and FRP client for Home Assistant"
+  org.opencontainers.image.source: "https://github.com/richpear/ha-addons"
+  org.opencontainers.image.licenses: "MIT"

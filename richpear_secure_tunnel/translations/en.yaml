@@ -1,0 +1,16 @@
+configuration:
+  control_plane_url:
+    name: Control Plane URL
+    description: URL of the Richpear admin/control-plane endpoint.
+  email:
+    name: Email
+    description: Customer email used for registration.
+  subdomain:
+    name: Subdomain
+    description: Requested subdomain for remote access.
+  device_name:
+    name: Device Name
+    description: Friendly name for this Home Assistant installation.
+  ha_port:
+    name: Home Assistant Port
+    description: Local Home Assistant port (default 8123).

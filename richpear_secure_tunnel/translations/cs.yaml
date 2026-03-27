@@ -1,0 +1,16 @@
+configuration:
+  control_plane_url:
+    name: URL Control Plane
+    description: URL Richpear admin/control-plane endpointu.
+  email:
+    name: Email
+    description: Zakaznicky email pro registraci.
+  subdomain:
+    name: Subdomena
+    description: Pozadovana subdomena pro vzdaleny pristup.
+  device_name:
+    name: Nazev zarizeni
+    description: Pratelsky nazev teto Home Assistant instalace.
+  ha_port:
+    name: Port Home Assistant
+    description: Lokalni port Home Assistant (vychozi 8123).
