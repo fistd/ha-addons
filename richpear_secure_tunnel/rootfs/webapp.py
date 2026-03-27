@@ -120,81 +120,244 @@ def index():
     return render_template_string(
         """
 <!doctype html>
-<html>
+<html lang="cs">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Richpear Tunnel Onboarding</title>
+  <title>RichPear Tunnel Setup</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:linear-gradient(180deg,#f2f6ff,#edf5f2); margin:0; }
-    .wrap { max-width: 760px; margin: 22px auto; background:#fff; border-radius: 14px; padding: 22px; box-shadow:0 12px 30px rgba(16,30,70,.10);}
-    h1 { margin-top: 0; }
-    .row { margin-bottom: 14px; }
-    input { width:100%; box-sizing: border-box; padding: 10px; border:1px solid #ccd3de; border-radius: 8px; }
-    button { background:#145af2; color:#fff; border:0; border-radius: 8px; padding: 10px 14px; cursor:pointer; }
-    button.secondary { background:#4b5565; }
-    button.ok { background:#198754; }
-    .hint { color:#58667a; font-size: 14px; }
-    .ok { background:#e8f7ee; border:1px solid #b8e3c7; color:#114d27; padding:10px; border-radius:8px; }
-    .err { background:#fdecec; border:1px solid #f5c2c2; color:#7f1d1d; padding:10px; border-radius:8px; }
-    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
-    .cardline { border:1px solid #dbe5f3; border-radius:10px; padding:14px; margin-top:14px; }
-    .badge { display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; font-weight:600; }
-    .b-ok { background:#e9f7ef; color:#146c43; border:1px solid #bfe7cf; }
-    .b-off { background:#f8eaed; color:#9f1239; border:1px solid #f3c7d2; }
-    .muted-small { color:#6b778d; font-size:13px; }
+    :root {
+      --bg-main: #f5f9f1;
+      --bg-soft: #eef6e8;
+      --card: #ffffff;
+      --line: #d6e5cd;
+      --text: #17301c;
+      --muted: #51695a;
+      --primary: #1f6fff;
+      --primary-ink: #ffffff;
+      --ok: #198754;
+      --ok-bg: #e9f7ef;
+      --ok-line: #bfe7cf;
+      --warn: #9f1239;
+      --warn-bg: #fdecef;
+      --warn-line: #f3c7d2;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 10%, rgba(87, 177, 110, 0.10), transparent 36%),
+        radial-gradient(circle at 88% 88%, rgba(31, 111, 255, 0.08), transparent 32%),
+        linear-gradient(165deg, var(--bg-main), var(--bg-soft));
+      min-height: 100vh;
+    }
+    .page {
+      max-width: 860px;
+      margin: 26px auto;
+      padding: 0 14px;
+    }
+    .hero {
+      background: linear-gradient(125deg, #173d20, #245f31);
+      color: #f3fff0;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 20px 44px rgba(22, 57, 33, 0.22);
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: #ffffff;
+      color: #12351b;
+      font-weight: 800;
+      margin-right: 10px;
+      font-size: 13px;
+    }
+    .hero h1 { margin: 0 0 6px; font-size: 26px; line-height: 1.2; }
+    .hero p { margin: 0; color: rgba(243,255,240,0.84); font-size: 14px; }
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .meta-item {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+    .meta-label { color: rgba(243,255,240,0.76); display: block; margin-bottom: 4px; }
+    .meta-value { font-weight: 700; word-break: break-word; }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+    .up { background: #e9f7ef; color: #146c43; border-color: #bfe7cf; }
+    .down { background: #fdecef; color: #9f1239; border-color: #f3c7d2; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+    .flash { margin: 10px 0; padding: 10px 12px; border-radius: 10px; font-size: 14px; }
+    .flash.ok { background: var(--ok-bg); border: 1px solid var(--ok-line); color: #0f5831; }
+    .flash.err { background: var(--warn-bg); border: 1px solid var(--warn-line); color: #7f1d1d; }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 14px 36px rgba(20, 51, 27, 0.10);
+      padding: 16px;
+      margin-top: 14px;
+    }
+    .panel h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+    .muted { color: var(--muted); font-size: 13px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .box {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      background: #fbfdf9;
+    }
+    .box h4 { margin: 0 0 8px; font-size: 14px; }
+    .row { margin-bottom: 10px; }
+    input {
+      width: 100%;
+      border: 1px solid #c8d8be;
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+      background: #ffffff;
+      color: var(--text);
+    }
+    input:focus {
+      border-color: #6ea6ff;
+      box-shadow: 0 0 0 4px rgba(31,111,255,.13);
+    }
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--primary-ink);
+      background: var(--primary);
+      transition: transform .05s ease, filter .15s ease;
+    }
+    .btn:hover { filter: brightness(1.05); }
+    .btn:active { transform: translateY(1px); }
+    .btn.secondary { background: #5f6c84; }
+    .btn.ok { background: var(--ok); }
+    .btn:disabled {
+      cursor: not-allowed;
+      filter: grayscale(.45);
+      opacity: .6;
+    }
+    .row-inline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .domain {
+      color: #245f31;
+      font-weight: 700;
+      background: #eff8ea;
+      border: 1px solid #d5e9c8;
+      border-radius: 8px;
+      padding: 4px 8px;
+    }
     @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .meta { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Richpear Secure Tunnel</h1>
-    <p class="hint">Device ID: {{ device_id }}</p>
-    <p class="hint">Control plane: {{ control_plane_url }}</p>
-    <p class="hint">Tunnel:
-      {% if frpc_up %}<span class="badge b-ok">running</span>{% else %}<span class="badge b-off">stopped</span>{% endif %}
-    </p>
-    {% if state.get("full_domain") %}
-    <p class="hint">Aktivni domena: <strong>https://{{ state.get("full_domain") }}</strong></p>
-    {% endif %}
-    {% if flash_ok %}<div class="ok">{{ flash_ok }}</div>{% endif %}
-    {% if flash_err %}<div class="err">{{ flash_err }}</div>{% endif %}
+  <div class="page">
+    <section class="hero">
+      <div style="display:flex; align-items:center; margin-bottom:8px;">
+        <span class="brand">RP</span>
+        <div>
+          <h1>RichPear Secure Tunnel</h1>
+          <p>Nastaveni pristupu z Home Assistanta do internetu.</p>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="meta-item">
+          <span class="meta-label">Device ID</span>
+          <span class="meta-value">{{ device_id }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Control plane</span>
+          <span class="meta-value">{{ control_plane_url }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Stav tunelu</span>
+          {% if frpc_up %}<span class="status-pill up"><span class="dot"></span>Running</span>{% else %}<span class="status-pill down"><span class="dot"></span>Stopped</span>{% endif %}
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Aktivni domena</span>
+          <span class="meta-value">{% if state.get("full_domain") %}https://{{ state.get("full_domain") }}{% else %}-{% endif %}</span>
+        </div>
+      </div>
+    </section>
 
-    <div class="cardline">
-      <h3 style="margin-top:0;">1) Ucet</h3>
+    {% if flash_ok %}<div class="flash ok">{{ flash_ok }}</div>{% endif %}
+    {% if flash_err %}<div class="flash err">{{ flash_err }}</div>{% endif %}
+
+    <section class="panel">
+      <h3>1) Ucet zakaznika</h3>
       {% if is_logged %}
-      <div class="ok">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status","-") }})</div>
+      <div class="flash ok">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status","-") }})</div>
       {% else %}
       <div class="grid">
-        <form method="post" action="signup">
-          <div class="muted-small" style="margin-bottom:8px;">Nemam ucet</div>
+        <form method="post" action="signup" class="box">
+          <h4>Nemam ucet</h4>
           <div class="row"><input name="email" type="email" placeholder="E-mail" required /></div>
-          <div class="row"><input name="password" type="password" placeholder="Heslo (min 8)" required /></div>
-          <button type="submit">Registrovat</button>
+          <div class="row"><input name="password" type="password" placeholder="Heslo (min 10, pismena + cisla)" required /></div>
+          <button type="submit" class="btn">Registrovat</button>
         </form>
-        <form method="post" action="login">
-          <div class="muted-small" style="margin-bottom:8px;">Uz mam ucet</div>
+        <form method="post" action="login" class="box">
+          <h4>Uz mam ucet</h4>
           <div class="row"><input name="email" type="email" placeholder="E-mail" required /></div>
           <div class="row"><input name="password" type="password" placeholder="Heslo" required /></div>
-          <button type="submit">Prihlasit</button>
+          <button type="submit" class="btn">Prihlasit</button>
         </form>
       </div>
       {% endif %}
-    </div>
+    </section>
 
-    <div class="cardline">
-      <h3 style="margin-top:0;">2) Subdomena a pripojeni</h3>
+    <section class="panel">
+      <h3>2) Subdomena a pripojeni</h3>
       <form method="post" action="connect">
-        <div class="row"><input name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} /></div>
-        <button type="submit" class="ok" {% if not is_logged %}disabled{% endif %}>Pripojit tunel</button>
+        <div class="row-inline" style="margin-bottom:10px;">
+          <input style="flex:1; min-width:220px;" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
+          <span class="domain">.cz.richpear.cz</span>
+        </div>
+        <button type="submit" class="btn ok" {% if not is_logged %}disabled{% endif %}>Pripojit tunel</button>
       </form>
       {% if not is_logged %}
-      <p class="muted-small">Nejdriv se registruj nebo prihlas.</p>
+      <p class="muted">Nejdriv se registruj nebo prihlas.</p>
       {% endif %}
       <form method="post" action="restart" style="margin-top:10px;">
-        <button type="submit" class="secondary">Restart tunelu</button>
+        <button type="submit" class="btn secondary">Restart tunelu</button>
       </form>
-    </div>
+    </section>
   </div>
 </body>
 </html>

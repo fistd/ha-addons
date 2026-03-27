@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+- Unified add-on onboarding UI with the new RichPear admin visual style (cards, typography, forms, status badges).
+- Improved tunnel setup panel clarity and mobile responsiveness.
+- Kept onboarding flow and API behavior unchanged for compatibility.
+
 ## 0.2.1
 
 - Fixed Home Assistant ingress 404 after signup/login/connect (ingress-aware redirects and relative form actions).
