@@ -1,5 +1,5 @@
 name: Richpear Secure Tunnel
-version: "0.1.0"
+version: "0.1.1"
 slug: richpear_secure_tunnel
 description: Secure outbound tunnel registration and connection for Home Assistant.
 startup: services
@@ -19,9 +19,11 @@ options:
   subdomain: ""
   device_name: "home-assistant"
   ha_port: 8123
+  upstream_host_header: "localhost"
 schema:
   control_plane_url: url
   email: email
   subdomain: str
   device_name: str
   ha_port: port
+  upstream_host_header: str

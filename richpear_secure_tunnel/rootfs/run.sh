@@ -12,6 +12,7 @@ EMAIL=$(jq -r '.email' "$CONFIG_PATH")
 SUBDOMAIN=$(jq -r '.subdomain' "$CONFIG_PATH")
 DEVICE_NAME=$(jq -r '.device_name' "$CONFIG_PATH")
 HA_PORT=$(jq -r '.ha_port // 8123' "$CONFIG_PATH")
+UPSTREAM_HOST_HEADER=$(jq -r '.upstream_host_header // "localhost"' "$CONFIG_PATH")
 
 DEVICE_ID_FILE="/data/device_id"
 KEY_FILE="/data/device_key.pem"
@@ -85,6 +86,7 @@ type = "http"
 localIP = "127.0.0.1"
 localPort = ${HA_PORT}
 subdomain = "${SUBDOMAIN}"
+hostHeaderRewrite = "${UPSTREAM_HOST_HEADER}"
 EOF
 
 echo "Starting frpc tunnel for ${SUBDOMAIN}.${FRP_SERVER}"

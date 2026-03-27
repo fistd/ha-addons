@@ -14,3 +14,6 @@ configuration:
   ha_port:
     name: Home Assistant Port
     description: Local Home Assistant port (default 8123).
+  upstream_host_header:
+    name: Upstream Host Header
+    description: Host header sent to Home Assistant (default localhost).
