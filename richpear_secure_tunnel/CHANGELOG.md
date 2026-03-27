@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.10
+
+- Fixed persistent login: add-on startup no longer overwrites onboarding_state.json and removes access_token during legacy auto-connect path.
+- Existing state keys are now preserved on restart (token, plan_status, etc.).
+
 ## 0.2.9
 
 - Fixed HA theme sync in ingress iframe: addon now actively reads Home Assistant theme variables from parent and updates live.

@@ -114,7 +114,17 @@ EOF
   echo "Starting legacy frpc tunnel for ${FULL_DOMAIN}"
   "$FRP_BIN" -c "$FRPC_CONFIG" >>"$FRPC_LOG" 2>&1 &
 
-  cat > "$STATE_FILE" <<EOF
+  # Preserve existing onboarding state (access_token, plan_status, etc.)
+  # and only update legacy connection fields.
+  if [ -f "$STATE_FILE" ]; then
+    jq \
+      --arg email "$EMAIL" \
+      --arg subdomain "$SUBDOMAIN" \
+      --arg full_domain "$FULL_DOMAIN" \
+      '.email=$email | .subdomain=$subdomain | .full_domain=$full_domain | .legacy_mode=true' \
+      "$STATE_FILE" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
+  else
+    cat > "$STATE_FILE" <<EOF
 {
   "email": "${EMAIL}",
   "subdomain": "${SUBDOMAIN}",
@@ -122,6 +132,7 @@ EOF
   "legacy_mode": true
 }
 EOF
+  fi
 }
 
 start_legacy_tunnel_if_configured
