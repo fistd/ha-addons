@@ -142,6 +142,10 @@ def index():
       --warn: #b1222b;
       --warn-bg: #fdecef;
       --warn-line: #f3c7d2;
+      --input-bg: #ffffff;
+      --input-text: #062910;
+      --input-line: #d6e0db;
+      --focus-glow: rgba(0,77,41,.12);
       --radius: 14px;
     }
     @media (prefers-color-scheme: dark) {
@@ -160,6 +164,10 @@ def index():
         --warn: #d46372;
         --warn-bg: #321920;
         --warn-line: #5e2c37;
+        --input-bg: #0f1713;
+        --input-text: #e6efe9;
+        --input-line: #2d4036;
+        --focus-glow: rgba(45,155,103,.18);
       }
     }
     * { box-sizing: border-box; }
@@ -168,8 +176,8 @@ def index():
       font-family: "Segoe UI", "Noto Sans", system-ui, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 8% 10%, rgba(0, 77, 41, 0.08), transparent 36%),
-        radial-gradient(circle at 88% 88%, rgba(20, 71, 43, 0.06), transparent 32%),
+        radial-gradient(circle at 8% 10%, rgba(0, 77, 41, 0.06), transparent 34%),
+        radial-gradient(circle at 88% 88%, rgba(20, 71, 43, 0.05), transparent 30%),
         linear-gradient(165deg, var(--bg-main), var(--bg-soft));
       min-height: 100vh;
     }
@@ -294,12 +302,13 @@ def index():
       font-size: 14px;
       outline: none;
       transition: border-color .15s ease, box-shadow .15s ease;
-      background: #ffffff;
-      color: var(--text);
+      background: var(--input-bg);
+      color: var(--input-text);
+      border-color: var(--input-line);
     }
     input:focus {
       border-color: color-mix(in srgb, var(--primary) 70%, #ffffff 30%);
-      box-shadow: 0 0 0 4px rgba(0,77,41,.12);
+      box-shadow: 0 0 0 4px var(--focus-glow);
     }
     .btn {
       border: 0;

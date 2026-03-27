@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.7
+
+- Improved dark mode readability: dark input fields, dark input borders and softer focus glow in HA dark theme.
+- Reduced harsh contrast in dark mode background gradients.
+
 ## 0.2.6
 
 - Fixed add-on UI theming to respect Home Assistant light/dark mode (automatic dark palette via prefers-color-scheme).
