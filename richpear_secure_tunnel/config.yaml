@@ -1,5 +1,5 @@
 name: Richpear Secure Tunnel
-version: "0.1.1"
+version: "0.1.2"
 slug: richpear_secure_tunnel
 description: Secure outbound tunnel registration and connection for Home Assistant.
 startup: services

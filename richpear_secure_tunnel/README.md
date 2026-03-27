@@ -20,15 +20,9 @@ Add-on pro bezpecne vystaveni Home Assistant pres Richpear gateway.
 ## Poznamka
 
 Add-on potrebuje odchozi pristup na internet (HTTPS + FRP port `7000`).
+Add-on automaticky spousti lokalni reverzni proxy, ktera normalizuje hlavicky pro HA.
 
 ## Troubleshooting 400
 
-Pokud domena vraci `400: Bad Request`, vetsinou Home Assistant odmita puvodni externi `Host` hlavicku.
-Nechte `upstream_host_header=localhost` (vychozi), pripadne v HA povolte reverzni proxy:
-
-```yaml
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 127.0.0.1
-```
+Pokud domena vraci `400: Bad Request`, zkontrolujte, ze bezi verze add-onu `0.1.2+`.
+Tato verze problem resi automaticky bez nutnosti upravovat `configuration.yaml`.

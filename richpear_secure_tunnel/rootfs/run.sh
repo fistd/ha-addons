@@ -13,6 +13,7 @@ SUBDOMAIN=$(jq -r '.subdomain' "$CONFIG_PATH")
 DEVICE_NAME=$(jq -r '.device_name' "$CONFIG_PATH")
 HA_PORT=$(jq -r '.ha_port // 8123' "$CONFIG_PATH")
 UPSTREAM_HOST_HEADER=$(jq -r '.upstream_host_header // "localhost"' "$CONFIG_PATH")
+LOCAL_PROXY_PORT=18123
 
 DEVICE_ID_FILE="/data/device_id"
 KEY_FILE="/data/device_key.pem"
@@ -73,6 +74,24 @@ if [ ! -x "$FRP_BIN" ]; then
   chmod +x "$FRP_BIN"
 fi
 
+# Start local reverse proxy to normalize headers for Home Assistant.
+# This avoids requiring manual trusted_proxies configuration on customer HA.
+CADDYFILE="/tmp/Caddyfile"
+cat > "$CADDYFILE" <<EOF
+:${LOCAL_PROXY_PORT} {
+  reverse_proxy 127.0.0.1:${HA_PORT} {
+    header_up Host ${UPSTREAM_HOST_HEADER}
+    header_up -X-Forwarded-For
+    header_up -X-Forwarded-Host
+    header_up -X-Forwarded-Proto
+    header_up -Forwarded
+  }
+}
+EOF
+
+echo "Starting local header-normalizing proxy on :${LOCAL_PROXY_PORT} -> 127.0.0.1:${HA_PORT}"
+caddy run --config "$CADDYFILE" --adapter caddyfile >/tmp/caddy.log 2>&1 &
+
 FRPC_CONFIG="/data/frpc.toml"
 cat > "$FRPC_CONFIG" <<EOF
 serverAddr = "${FRP_SERVER}"
@@ -84,7 +103,7 @@ metadatas.token = "${FRP_TOKEN}"
 name = "${SUBDOMAIN}-ha"
 type = "http"
 localIP = "127.0.0.1"
-localPort = ${HA_PORT}
+localPort = ${LOCAL_PROXY_PORT}
 subdomain = "${SUBDOMAIN}"
 hostHeaderRewrite = "${UPSTREAM_HOST_HEADER}"
 EOF
