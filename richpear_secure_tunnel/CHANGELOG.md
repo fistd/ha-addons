@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.20
+
+- Fixed onboarding auth switching so only one form is visible at a time (`Přihlášení` or `Registrace`).
+- Replaced addon branding asset with your provided `rp-home.svg` logo for header/auth screens and addon icon/logo files.
+
 ## 0.2.19
 
 - Addon now starts with account onboarding screen only (`Přihlášení / Registrace`) like the client portal.

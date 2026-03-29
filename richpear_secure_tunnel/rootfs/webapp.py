@@ -305,7 +305,7 @@ def index():
     }
 
     .auth-form { display: none; }
-    .auth-form.active { display: block; }
+    .auth-form.active { display: flex; flex-direction: column; gap: 10px; }
 
     .stack { display: flex; flex-direction: column; gap: 10px; }
 
@@ -661,13 +661,13 @@ def index():
           </div>
         </div>
 
-        <form method="post" action="login" class="auth-form active stack" data-auth-form="login">
+        <form method="post" action="login" class="auth-form active" data-auth-form="login">
           <input class="field" name="email" type="email" placeholder="E-mail" required />
           <input class="field" name="password" type="password" placeholder="Heslo" required />
           <button type="submit" class="btn primary">Přihlásit se</button>
         </form>
 
-        <form method="post" action="signup" class="auth-form stack" data-auth-form="signup">
+        <form method="post" action="signup" class="auth-form" data-auth-form="signup">
           <input class="field" name="email" type="email" placeholder="E-mail" required />
           <input class="field" name="password" type="password" placeholder="Heslo (min. 10, písmena + čísla)" required />
           <button type="submit" class="btn primary">Registrovat se</button>
