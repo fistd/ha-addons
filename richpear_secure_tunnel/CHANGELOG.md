@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.19
+
+- Addon now starts with account onboarding screen only (`Přihlášení / Registrace`) like the client portal.
+- After login, addon opens dashboard view with the same core info blocks as client dashboard (account status, devices, subdomain).
+- Added fully functional top tabs and clickable KPI cards that switch real sections (`Moje zařízení`, `Subdoména`, `Účet`, `Fakturační údaje`).
+
 ## 0.2.18
 
 - Updated addon UI text to Czech with proper diacritics (navigation, section labels, action buttons, and status messages).

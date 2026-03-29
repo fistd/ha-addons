@@ -34,7 +34,7 @@ def load_state() -> dict:
 
 
 def save_state(state: dict) -> None:
-    Path(STATE_FILE).write_text(json.dumps(state, ensure_ascii=True, indent=2), encoding="utf-8")
+    Path(STATE_FILE).write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def load_device_id() -> str:
@@ -122,6 +122,8 @@ def addon_logo():
 def index():
     state = load_state()
     is_logged = bool(state.get("access_token"))
+    email = str(state.get("email", ""))
+    username = email.split("@")[0] if "@" in email else "uživateli"
     return render_template_string(
         """
 <!doctype html>
@@ -180,7 +182,7 @@ def index():
     .top {
       position: sticky;
       top: 0;
-      z-index: 15;
+      z-index: 20;
       border-bottom: 1px solid var(--line);
       backdrop-filter: blur(8px);
       background: color-mix(in srgb, var(--card) 92%, transparent);
@@ -211,6 +213,147 @@ def index():
       object-fit: contain;
       border-radius: 6px;
       display: block;
+    }
+
+    .main { padding: 20px 0 28px; }
+
+    .flash {
+      margin-bottom: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    .flash.ok {
+      color: color-mix(in srgb, var(--ok) 83%, var(--text) 17%);
+      background: color-mix(in srgb, var(--ok) 18%, var(--card) 82%);
+      border-color: color-mix(in srgb, var(--ok) 35%, var(--line) 65%);
+    }
+
+    .flash.err {
+      color: color-mix(in srgb, var(--err) 86%, var(--text) 14%);
+      background: color-mix(in srgb, var(--err) 14%, var(--card) 86%);
+      border-color: color-mix(in srgb, var(--err) 36%, var(--line) 64%);
+    }
+
+    .auth-layout {
+      min-height: calc(100vh - 120px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 0;
+    }
+
+    .auth-card {
+      width: min(460px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+      padding: 18px;
+    }
+
+    .auth-head {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .auth-head img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+
+    .auth-head h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .auth-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .auth-tabs {
+      display: inline-flex;
+      gap: 5px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--chip);
+      padding: 4px;
+      margin: 0 auto 14px;
+    }
+
+    .auth-tab {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-tab.active {
+      background: color-mix(in srgb, var(--card) 90%, #000000 10%);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+
+    .stack { display: flex; flex-direction: column; gap: 10px; }
+
+    .field {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--input);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .field:focus {
+      border-color: color-mix(in srgb, var(--primary) 68%, var(--line) 32%);
+      box-shadow: 0 0 0 3px var(--focus);
+    }
+
+    .btn {
+      border-radius: 10px;
+      border: 1px solid transparent;
+      padding: 10px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: var(--primary-ink);
+      border-color: color-mix(in srgb, var(--primary) 68%, #000000 32%);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    .help {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 10px;
     }
 
     .nav {
@@ -262,15 +405,13 @@ def index():
       cursor: pointer;
     }
 
-    .main { padding: 20px 0 28px; }
-
     .greet {
       margin-bottom: 14px;
     }
 
     .greet h1 {
       margin: 0;
-      font-size: 42px;
+      font-size: 36px;
       line-height: 1.08;
       letter-spacing: -0.02em;
     }
@@ -279,26 +420,6 @@ def index():
       margin: 5px 0 0;
       color: var(--muted);
       font-size: 14px;
-    }
-
-    .flash {
-      margin-bottom: 10px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 14px;
-    }
-
-    .flash.ok {
-      color: color-mix(in srgb, var(--ok) 83%, var(--text) 17%);
-      background: color-mix(in srgb, var(--ok) 18%, var(--card) 82%);
-      border-color: color-mix(in srgb, var(--ok) 35%, var(--line) 65%);
-    }
-
-    .flash.err {
-      color: color-mix(in srgb, var(--err) 86%, var(--text) 14%);
-      background: color-mix(in srgb, var(--err) 14%, var(--card) 86%);
-      border-color: color-mix(in srgb, var(--err) 36%, var(--line) 64%);
     }
 
     .grid {
@@ -314,6 +435,12 @@ def index():
       background: var(--card);
       padding: 16px;
       min-height: 126px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .kpi:hover {
+      border-color: color-mix(in srgb, var(--primary) 38%, var(--line) 62%);
     }
 
     .kpi-head {
@@ -356,24 +483,26 @@ def index():
       word-break: break-word;
     }
 
-    .panel {
+    .section {
       grid-column: 1 / -1;
       border: 1px solid var(--line);
       border-radius: 12px;
       background: var(--card);
+      display: none;
     }
 
-    .panel-h {
+    .section.active { display: block; }
+
+    .section-h {
       padding: 14px 16px;
       border-bottom: 1px solid var(--line);
       font-size: 16px;
       line-height: 1;
       font-weight: 700;
-      letter-spacing: 0;
       margin: 0;
     }
 
-    .panel-b {
+    .section-b {
       padding: 14px 16px;
     }
 
@@ -439,88 +568,11 @@ def index():
       gap: 12px;
     }
 
-    .settings-wrap {
-      grid-column: 1 / -1;
-    }
-
-    .settings-details {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--card);
-      overflow: hidden;
-    }
-
-    .settings-summary {
-      list-style: none;
-      cursor: pointer;
-      padding: 12px 14px;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--muted);
-      border-bottom: 1px solid transparent;
-      user-select: none;
-    }
-
-    .settings-summary::-webkit-details-marker { display: none; }
-
-    .settings-details[open] .settings-summary {
-      color: var(--text);
-      border-bottom-color: var(--line);
-    }
-
     .sub-title {
       margin: 0 0 10px;
       color: var(--muted);
       font-size: 14px;
       font-weight: 600;
-    }
-
-    .stack { display: flex; flex-direction: column; gap: 10px; }
-
-    .auth-tabs {
-      display: inline-flex;
-      gap: 5px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: var(--chip);
-      padding: 4px;
-    }
-
-    .auth-tab {
-      border: 0;
-      background: transparent;
-      color: var(--muted);
-      border-radius: 999px;
-      padding: 7px 11px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .auth-tab.active {
-      background: color-mix(in srgb, var(--card) 90%, #000000 10%);
-      color: var(--text);
-      border: 1px solid var(--line);
-    }
-
-    .auth-form { display: none; }
-    .auth-form.active { display: flex; }
-
-    .field {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: var(--input);
-      color: var(--text);
-      border-radius: 10px;
-      padding: 11px 12px;
-      font-size: 14px;
-      outline: none;
-      transition: border-color .15s ease, box-shadow .15s ease;
-    }
-
-    .field:focus {
-      border-color: color-mix(in srgb, var(--primary) 68%, var(--line) 32%);
-      box-shadow: 0 0 0 3px var(--focus);
     }
 
     .domain {
@@ -540,34 +592,33 @@ def index():
       font-weight: 700;
     }
 
-    .btn {
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .meta-item {
+      border: 1px solid var(--line);
       border-radius: 10px;
-      border: 1px solid transparent;
-      padding: 10px 14px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
+      padding: 10px 12px;
+      background: color-mix(in srgb, var(--card) 90%, transparent);
     }
 
-    .btn.primary {
-      background: var(--primary);
-      color: var(--primary-ink);
-      border-color: color-mix(in srgb, var(--primary) 68%, #000000 32%);
+    .meta-item strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
     }
-
-    .btn.ghost {
-      background: transparent;
-      color: var(--text);
-      border-color: var(--line);
-    }
-
-    .btn:disabled { opacity: .6; cursor: not-allowed; }
-
-    .muted { color: var(--muted); font-size: 13px; }
 
     @media (max-width: 980px) {
       .kpi { grid-column: span 6; }
-      .settings-grid { grid-template-columns: 1fr; }
+      .settings-grid, .meta-grid { grid-template-columns: 1fr; }
       .brand { font-size: 15px; }
     }
 
@@ -577,115 +628,160 @@ def index():
       .brand { font-size: 14px; }
       .brand img { width: 26px; height: 26px; }
       .kpi { grid-column: 1 / -1; }
-      .panel-h { font-size: 16px; }
-      .greet h1 { font-size: 34px; }
+      .greet h1 { font-size: 30px; }
       .domain { grid-template-columns: 1fr; }
       .user { width: 100%; justify-content: flex-end; }
     }
   </style>
 </head>
 <body>
+  {% if not is_logged %}
   <header class="top">
     <div class="container top-inner">
       <div class="brand"><img src="rp-home.svg" alt="RichPear logo" />RichPear Home</div>
-      <nav class="nav">
-        <a class="nav-item active" href="#overview" data-nav="overview">Přehled</a>
-        <a class="nav-item" href="#devices" data-nav="devices">Moje zařízení</a>
-        <a class="nav-item" href="#settings" data-nav="subdomain">Subdoména</a>
-        <a class="nav-item" href="#settings" data-nav="account">Účet</a>
-        <a class="nav-item" href="#settings" data-nav="billing">Fakturační údaje</a>
-      </nav>
-      {% if is_logged %}
-      <div class="user">
-        <span>{{ state.get("email", "") }}</span>
-        <form method="post" action="logout" style="margin:0;"><button class="logout" type="submit">Odhlásit</button></form>
-      </div>
-      {% endif %}
     </div>
   </header>
 
   <main class="container main">
-    <section class="greet" id="overview">
-      <h1>Ahoj, {% if state.get("email") %}{{ state.get("email").split("@")[0] }}{% else %}uživateli{% endif %} 👋</h1>
-      <p>Přehled vašeho účtu a zařízení.</p>
-    </section>
-
     {% if flash_ok %}<div class="flash ok">{{ flash_ok }}</div>{% endif %}
     {% if flash_err %}<div class="flash err">{{ flash_err }}</div>{% endif %}
 
-    <section class="grid">
-      <article class="kpi">
-        <div class="kpi-head"><span class="kpi-title">Stav účtu</span><span class="kpi-icon">◻</span></div>
-        <p class="kpi-value">{% if is_logged %}{{ state.get("plan_status", "active") }}{% else %}guest{% endif %}</p>
-        <div class="kpi-sub">{% if state.get("email") %}{{ state.get("email") }}{% else %}—{% endif %}</div>
+    <section class="auth-layout">
+      <article class="auth-card">
+        <div class="auth-head">
+          <img src="rp-home.svg" alt="RichPear logo" />
+          <h1>RichPear Home</h1>
+          <p>Přihlaste se nebo si vytvořte účet.</p>
+        </div>
+
+        <div style="text-align:center;">
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab active" data-auth-tab="login">Přihlášení</button>
+            <button type="button" class="auth-tab" data-auth-tab="signup">Registrace</button>
+          </div>
+        </div>
+
+        <form method="post" action="login" class="auth-form active stack" data-auth-form="login">
+          <input class="field" name="email" type="email" placeholder="E-mail" required />
+          <input class="field" name="password" type="password" placeholder="Heslo" required />
+          <button type="submit" class="btn primary">Přihlásit se</button>
+        </form>
+
+        <form method="post" action="signup" class="auth-form stack" data-auth-form="signup">
+          <input class="field" name="email" type="email" placeholder="E-mail" required />
+          <input class="field" name="password" type="password" placeholder="Heslo (min. 10, písmena + čísla)" required />
+          <button type="submit" class="btn primary">Registrovat se</button>
+        </form>
+
+        <p class="help">Po přihlášení se otevře klientský dashboard addonu.</p>
       </article>
-      <article class="kpi">
+    </section>
+  </main>
+
+  {% else %}
+  <header class="top">
+    <div class="container top-inner">
+      <div class="brand"><img src="rp-home.svg" alt="RichPear logo" />RichPear Home</div>
+      <nav class="nav">
+        <a class="nav-item active" href="#" data-nav="overview">Přehled</a>
+        <a class="nav-item" href="#" data-nav="devices">Moje zařízení</a>
+        <a class="nav-item" href="#" data-nav="subdomain">Subdoména</a>
+        <a class="nav-item" href="#" data-nav="account">Účet</a>
+        <a class="nav-item" href="#" data-nav="billing">Fakturační údaje</a>
+      </nav>
+      <div class="user">
+        <span>{{ state.get("email", "") }}</span>
+        <form method="post" action="logout" style="margin:0;"><button class="logout" type="submit">Odhlásit</button></form>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main">
+    {% if flash_ok %}<div class="flash ok">{{ flash_ok }}</div>{% endif %}
+    {% if flash_err %}<div class="flash err">{{ flash_err }}</div>{% endif %}
+
+    <section class="greet">
+      <h1>Ahoj, {{ username }} 👋</h1>
+      <p>Přehled vašeho účtu a zařízení.</p>
+    </section>
+
+    <section class="grid" id="overview-section">
+      <a class="kpi" href="#" data-goto="account">
+        <div class="kpi-head"><span class="kpi-title">Stav účtu</span><span class="kpi-icon">◻</span></div>
+        <p class="kpi-value">{{ state.get("plan_status", "active") }}</p>
+        <div class="kpi-sub">{{ state.get("email", "—") }}</div>
+      </a>
+
+      <a class="kpi" href="#" data-goto="devices">
         <div class="kpi-head"><span class="kpi-title">Zařízení</span><span class="kpi-icon">⌂</span></div>
         <p class="kpi-value">1</p>
-        <div class="kpi-sub">{% if frpc_up %}+1 1 online{% else %}0 online{% endif %}</div>
-      </article>
-      <article class="kpi">
+        <div class="kpi-sub">{% if frpc_up %}1 online{% else %}0 online{% endif %}</div>
+      </a>
+
+      <a class="kpi" href="#" data-goto="subdomain">
         <div class="kpi-head"><span class="kpi-title">Subdoména</span><span class="kpi-icon">◎</span></div>
         <p class="kpi-value">{% if state.get("subdomain") %}{{ state.get("subdomain") }}{% else %}—{% endif %}</p>
         <div class="kpi-sub">{% if state.get("full_domain") %}{{ state.get("full_domain") }}{% else %}Nenastavená{% endif %}</div>
-      </article>
+      </a>
 
-      <article class="panel" id="devices">
-        <h2 class="panel-h">Moje zařízení</h2>
-        <div class="panel-b">
+      <article class="section active" id="section-devices" data-section="devices">
+        <h2 class="section-h">Moje zařízení</h2>
+        <div class="section-b">
           <div class="device-row">
             <div>
               <p class="device-id">{{ device_id }}</p>
               <div class="device-sub">Control plane: {{ control_plane_url }}</div>
+              <div class="device-sub">Poslední aktivita: {{ now }}</div>
             </div>
             {% if frpc_up %}<span class="status up"><span class="status-dot"></span>Online</span>{% else %}<span class="status down"><span class="status-dot"></span>Offline</span>{% endif %}
           </div>
         </div>
       </article>
 
-      <article class="settings-wrap" id="settings">
-        <details class="settings-details">
-          <summary class="settings-summary">Nastavení účtu a tunelu</summary>
-          <div class="panel-b settings-grid">
-            <section class="stack">
-              <h3 class="sub-title">Účet zákazníka</h3>
-              {% if is_logged %}
-                <div class="flash ok" style="margin:0;">Přihlášeno jako <strong>{{ state.get("email") }}</strong> (plán: {{ state.get("plan_status", "-") }})</div>
-              {% else %}
-                <div class="auth-tabs">
-                  <button type="button" class="auth-tab active" data-auth-tab="login">Přihlášení</button>
-                  <button type="button" class="auth-tab" data-auth-tab="signup">Registrace</button>
-                </div>
-                <form method="post" action="login" class="auth-form active stack" data-auth-form="login">
-                  <input class="field" name="email" type="email" placeholder="E-mail" required />
-                  <input class="field" name="password" type="password" placeholder="Heslo" required />
-                  <button type="submit" class="btn primary">Přihlásit</button>
-                </form>
-                <form method="post" action="signup" class="auth-form stack" data-auth-form="signup">
-                  <input class="field" name="email" type="email" placeholder="E-mail" required />
-                  <input class="field" name="password" type="password" placeholder="Heslo (min. 10, písmena + čísla)" required />
-                  <button type="submit" class="btn primary">Registrovat</button>
-                </form>
-              {% endif %}
-            </section>
+      <article class="section" id="section-subdomain" data-section="subdomain">
+        <h2 class="section-h">Subdoména</h2>
+        <div class="section-b settings-grid">
+          <section class="stack">
+            <h3 class="sub-title">Subdoména a připojení</h3>
+            <form method="post" action="connect" class="stack">
+              <div class="domain">
+                <input id="subdomain-input" class="field" name="subdomain" type="text" placeholder="např. rphome" value="{{ state.get('subdomain','') }}" required />
+                <span class="suffix">.cz.richpear.cz</span>
+              </div>
+              <button type="submit" class="btn primary">Připojit tunel</button>
+            </form>
+            <form method="post" action="restart" style="margin-top:8px;"><button type="submit" class="btn ghost">Restart tunelu</button></form>
+          </section>
+          <section class="stack">
+            <h3 class="sub-title">Aktuální stav</h3>
+            <div class="meta-item"><strong>Plná doména</strong>{% if state.get("full_domain") %}{{ state.get("full_domain") }}{% else %}Nenastavená{% endif %}</div>
+            <div class="meta-item"><strong>Proxy</strong>{% if frpc_up %}Běží{% else %}Neběží{% endif %}</div>
+          </section>
+        </div>
+      </article>
 
-            <section class="stack">
-              <h3 class="sub-title">Subdoména a připojení</h3>
-              <form method="post" action="connect" class="stack">
-                <div class="domain">
-                  <input id="subdomain-input" class="field" name="subdomain" type="text" placeholder="např. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
-                  <span class="suffix">.cz.richpear.cz</span>
-                </div>
-                <button type="submit" class="btn primary" {% if not is_logged %}disabled{% endif %}>Připojit tunel</button>
-                {% if not is_logged %}<span class="muted">Nejdřív se registruj nebo přihlas.</span>{% endif %}
-              </form>
-              <form method="post" action="restart" style="margin-top:8px;"><button type="submit" class="btn ghost">Restart tunelu</button></form>
-            </section>
-          </div>
-        </details>
+      <article class="section" id="section-account" data-section="account">
+        <h2 class="section-h">Účet</h2>
+        <div class="section-b meta-grid">
+          <div class="meta-item"><strong>E-mail</strong>{{ state.get("email", "—") }}</div>
+          <div class="meta-item"><strong>Plán</strong>{{ state.get("plan_status", "active") }}</div>
+          <div class="meta-item"><strong>Device ID</strong>{{ device_id }}</div>
+          <div class="meta-item"><strong>Control plane</strong>{{ control_plane_url }}</div>
+        </div>
+      </article>
+
+      <article class="section" id="section-billing" data-section="billing">
+        <h2 class="section-h">Fakturační údaje</h2>
+        <div class="section-b meta-grid">
+          <div class="meta-item"><strong>Stav fakturace</strong>Manuální správa (zatím)</div>
+          <div class="meta-item"><strong>Plán</strong>{{ state.get("plan_status", "active") }}</div>
+          <div class="meta-item"><strong>Stripe</strong>Bude přidáno později</div>
+          <div class="meta-item"><strong>Poznámka</strong>Údaje doplníme v klientském portálu</div>
+        </div>
       </article>
     </section>
   </main>
+  {% endif %}
 
   <script>
     (function () {
@@ -698,48 +794,42 @@ def index():
       tabs.forEach(function (tab) { tab.addEventListener('click', function () { setMode(tab.getAttribute('data-auth-tab')); }); });
 
       var navItems = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
-      var settingsDetails = document.querySelector('.settings-details');
+      var sections = Array.prototype.slice.call(document.querySelectorAll('[data-section]'));
+      var gotoCards = Array.prototype.slice.call(document.querySelectorAll('[data-goto]'));
       var subdomainInput = document.getElementById('subdomain-input');
 
-      function setActiveNav(name) {
-        navItems.forEach(function (item) {
-          item.classList.toggle('active', item.getAttribute('data-nav') === name);
+      function showSection(name) {
+        if (!sections.length || !navItems.length) return;
+        sections.forEach(function (section) {
+          section.classList.toggle('active', section.getAttribute('data-section') === name);
         });
+        navItems.forEach(function (item) {
+          item.classList.toggle('active', item.getAttribute('data-nav') === name || (name === 'devices' && item.getAttribute('data-nav') === 'overview'));
+        });
+        if (name === 'subdomain' && subdomainInput) {
+          setTimeout(function () { subdomainInput.focus(); }, 120);
+        }
       }
 
       navItems.forEach(function (item) {
-        item.addEventListener('click', function () {
+        item.addEventListener('click', function (e) {
+          e.preventDefault();
           var name = item.getAttribute('data-nav');
-          if (name === 'subdomain' || name === 'account' || name === 'billing') {
-            if (settingsDetails) settingsDetails.open = true;
-            if (name === 'subdomain' && subdomainInput) {
-              setTimeout(function () { subdomainInput.focus(); }, 120);
-            }
+          if (name === 'overview') {
+            showSection('devices');
+            return;
           }
-          setActiveNav(name === 'subdomain' || name === 'account' || name === 'billing' ? name : name);
+          showSection(name);
         });
       });
 
-      function detectSectionNav() {
-        var y = window.scrollY || window.pageYOffset;
-        var settings = document.getElementById('settings');
-        var devices = document.getElementById('devices');
-        if (settings && y >= settings.offsetTop - 120) {
-          var active = 'account';
-          var focused = document.activeElement && document.activeElement.id === 'subdomain-input';
-          if (focused) active = 'subdomain';
-          setActiveNav(active);
-          return;
-        }
-        if (devices && y >= devices.offsetTop - 120) {
-          setActiveNav('devices');
-          return;
-        }
-        setActiveNav('overview');
-      }
-
-      window.addEventListener('scroll', detectSectionNav, { passive: true });
-      detectSectionNav();
+      gotoCards.forEach(function (card) {
+        card.addEventListener('click', function (e) {
+          e.preventDefault();
+          var target = card.getAttribute('data-goto');
+          showSection(target);
+        });
+      });
 
       var THEME_VARS = [
         '--primary-background-color', '--secondary-background-color', '--card-background-color',
@@ -786,12 +876,14 @@ def index():
 </html>
         """,
         state=state,
+        is_logged=is_logged,
         control_plane_url=CONTROL_PLANE_URL,
         device_id=load_device_id(),
         frpc_up=frpc_running(),
-        is_logged=is_logged,
         flash_ok=request.args.get("ok", ""),
         flash_err=request.args.get("err", ""),
+        username=username,
+        now=__import__("datetime").datetime.now().strftime("%d. %m. %Y %H:%M:%S"),
     )
 
 
