@@ -3,8 +3,8 @@ import json
 import os
 import subprocess
 import urllib.error
-import urllib.request
 import urllib.parse
+import urllib.request
 from pathlib import Path
 
 from flask import Flask, redirect, render_template_string, request, send_file
@@ -133,33 +133,31 @@ def index():
   <style>
     :root {
       color-scheme: light dark;
-      --bg-main: var(--primary-background-color, #0a1020);
-      --bg-elev: var(--secondary-background-color, #111827);
-      --card: var(--card-background-color, #141c2f);
-      --line: var(--divider-color, #2a3450);
-      --text: var(--primary-text-color, #e8edf7);
-      --muted: var(--secondary-text-color, #a8b4cd);
-      --primary: var(--primary-color, #19c37d);
-      --primary-ink: var(--text-primary-color, #03130d);
-      --ok: var(--success-color, #24c881);
-      --err: var(--error-color, #ef5350);
-      --focus: color-mix(in srgb, var(--primary) 35%, transparent);
-      --chip: color-mix(in srgb, var(--card) 78%, var(--bg-elev) 22%);
-      --shadow: 0 20px 45px rgba(2, 7, 20, 0.36);
+      --bg-main: var(--primary-background-color, #0c1017);
+      --card: var(--card-background-color, #181b22);
+      --line: var(--divider-color, #2a313d);
+      --text: var(--primary-text-color, #f2f5fa);
+      --muted: var(--secondary-text-color, #9ba4b4);
+      --primary: var(--primary-color, #17a864);
+      --primary-ink: var(--text-primary-color, #e7f7ee);
+      --ok: var(--success-color, #2bbf67);
+      --err: var(--error-color, #e24f4f);
+      --chip-bg: color-mix(in srgb, var(--card) 80%, #111827 20%);
+      --input-bg: color-mix(in srgb, var(--card) 90%, #0f131a 10%);
+      --focus: color-mix(in srgb, var(--primary) 34%, transparent);
     }
 
     @media (prefers-color-scheme: light) {
       :root {
         --bg-main: var(--primary-background-color, #f3f6fb);
-        --bg-elev: var(--secondary-background-color, #ebf0f8);
         --card: var(--card-background-color, #ffffff);
-        --line: var(--divider-color, #d8e1ee);
-        --text: var(--primary-text-color, #101829);
-        --muted: var(--secondary-text-color, #5b6b85);
-        --primary: var(--primary-color, #0f8b5f);
+        --line: var(--divider-color, #d7deea);
+        --text: var(--primary-text-color, #0f172a);
+        --muted: var(--secondary-text-color, #5f6b7d);
+        --primary: var(--primary-color, #138d5e);
         --primary-ink: var(--text-primary-color, #ffffff);
-        --chip: color-mix(in srgb, var(--card) 55%, var(--bg-elev) 45%);
-        --shadow: 0 18px 35px rgba(15, 32, 66, 0.12);
+        --chip-bg: color-mix(in srgb, var(--card) 56%, #edf2f8 44%);
+        --input-bg: color-mix(in srgb, var(--card) 88%, #edf3fb 12%);
       }
     }
 
@@ -167,387 +165,519 @@ def index():
     html, body { min-height: 100%; }
     body {
       margin: 0;
-      color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--text);
       background:
-        radial-gradient(circle at 12% -10%, color-mix(in srgb, var(--primary) 13%, transparent), transparent 38%),
-        radial-gradient(circle at 90% 105%, color-mix(in srgb, var(--primary) 10%, transparent), transparent 35%),
-        linear-gradient(180deg, var(--bg-main), color-mix(in srgb, var(--bg-main) 76%, #000000 24%));
-      padding: 20px 14px 28px;
-    }
-
-    .shell {
-      max-width: 1080px;
-      margin: 0 auto;
+        radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 28%),
+        linear-gradient(180deg, var(--bg-main), color-mix(in srgb, var(--bg-main) 80%, #070b12 20%));
     }
 
     .topbar {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: color-mix(in srgb, var(--card) 94%, var(--bg-elev) 6%);
-      box-shadow: var(--shadow);
-      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(8px);
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .container {
+      width: min(1280px, calc(100% - 22px));
+      margin: 0 auto;
+    }
+
+    .topbar-inner {
+      min-height: 64px;
       display: flex;
-      gap: 14px;
       align-items: center;
       justify-content: space-between;
+      gap: 14px;
       flex-wrap: wrap;
-      margin-bottom: 16px;
+      padding: 10px 0;
     }
 
     .brand {
       display: inline-flex;
-      gap: 10px;
       align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
       font-weight: 700;
-      letter-spacing: 0.2px;
+      font-size: 18px;
     }
 
     .brand-logo {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       object-fit: contain;
-      flex: 0 0 auto;
+      display: block;
+      border-radius: 6px;
     }
 
     .nav {
       display: flex;
+      align-items: center;
       gap: 8px;
       flex-wrap: wrap;
     }
 
     .nav-item {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--chip-bg);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .nav-item.active {
+      background: color-mix(in srgb, var(--primary) 20%, var(--card) 80%);
+      border-color: color-mix(in srgb, var(--primary) 45%, var(--line) 55%);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .user-box {
       display: inline-flex;
       align-items: center;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      color: var(--muted);
-      background: var(--chip);
-    }
-
-    .hero {
-      margin-bottom: 12px;
-    }
-
-    .hero h1 {
-      margin: 0;
-      font-size: clamp(24px, 3.5vw, 34px);
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-    }
-
-    .hero p {
-      margin: 8px 0 0;
+      gap: 8px;
       color: var(--muted);
       font-size: 14px;
     }
 
+    .logout-btn {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 7px 11px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .page {
+      padding: 24px 0 30px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(35px, 4.2vw, 56px);
+      line-height: 1.03;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin: 8px 0 18px;
+      color: var(--muted);
+      font-size: 34px;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+    }
+
     .grid {
       display: grid;
-      gap: 12px;
+      gap: 14px;
       grid-template-columns: repeat(12, minmax(0, 1fr));
     }
 
     .card {
-      background: color-mix(in srgb, var(--card) 96%, var(--bg-elev) 4%);
+      grid-column: span 4;
       border: 1px solid var(--line);
-      border-radius: 14px;
-      box-shadow: var(--shadow);
-      padding: 16px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 20px;
+      min-height: 150px;
     }
-
-    .kpi { grid-column: span 4; min-height: 118px; }
-    .panel { grid-column: 1 / -1; }
 
     .label {
       color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 10px;
+      font-size: 34px;
+      line-height: 1.05;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
       display: block;
     }
 
-    .value {
-      font-size: 33px;
+    .kpi {
+      font-size: 52px;
       line-height: 1;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.035em;
+      font-weight: 800;
+      margin: 0;
     }
 
-    .value-sm {
-      font-size: 20px;
-      line-height: 1.2;
-      font-weight: 700;
+    .kpi-sm {
+      font-size: 44px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      margin: 0;
       word-break: break-word;
     }
 
     .sub {
-      margin-top: 8px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 28px;
+      line-height: 1.12;
+      margin-top: 10px;
+      word-break: break-word;
+    }
+
+    .panel {
+      grid-column: 1 / -1;
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .panel-title {
+      margin: 0 0 14px;
+      font-size: 50px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .device-row {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 86px;
+    }
+
+    .device-id {
+      font-size: 36px;
+      line-height: 1.06;
+      font-weight: 780;
+      letter-spacing: -0.02em;
+      margin: 0;
+      word-break: break-word;
+    }
+
+    .device-sub {
+      color: var(--muted);
+      font-size: 29px;
+      line-height: 1.1;
+      margin-top: 6px;
+      word-break: break-word;
     }
 
     .status-pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      border: 1px solid transparent;
+      gap: 8px;
       border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
+      border: 1px solid transparent;
+      font-size: 30px;
+      line-height: 1;
       font-weight: 700;
+      padding: 10px 18px;
+      white-space: nowrap;
     }
 
-    .up {
-      color: color-mix(in srgb, var(--ok) 92%, #ffffff 8%);
-      background: color-mix(in srgb, var(--ok) 20%, transparent);
+    .status-pill.up {
+      background: color-mix(in srgb, var(--ok) 18%, transparent);
       border-color: color-mix(in srgb, var(--ok) 40%, var(--line) 60%);
+      color: color-mix(in srgb, var(--ok) 88%, #ffffff 12%);
     }
 
-    .down {
-      color: color-mix(in srgb, var(--err) 92%, #ffffff 8%);
+    .status-pill.down {
       background: color-mix(in srgb, var(--err) 16%, transparent);
-      border-color: color-mix(in srgb, var(--err) 34%, var(--line) 66%);
+      border-color: color-mix(in srgb, var(--err) 36%, var(--line) 64%);
+      color: color-mix(in srgb, var(--err) 90%, #ffffff 10%);
     }
 
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: currentColor;
+    }
 
     .flash {
-      margin-bottom: 12px;
-      padding: 10px 12px;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid var(--line);
-      font-size: 14px;
-      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      font-size: 31px;
+      line-height: 1.08;
+      margin-bottom: 14px;
     }
 
     .flash.ok {
-      color: color-mix(in srgb, var(--ok) 85%, var(--text) 15%);
+      color: color-mix(in srgb, var(--ok) 82%, var(--text) 18%);
       background: color-mix(in srgb, var(--ok) 18%, var(--card) 82%);
-      border-color: color-mix(in srgb, var(--ok) 34%, var(--line) 66%);
+      border-color: color-mix(in srgb, var(--ok) 35%, var(--line) 65%);
     }
 
     .flash.err {
-      color: color-mix(in srgb, var(--err) 88%, var(--text) 12%);
+      color: color-mix(in srgb, var(--err) 84%, var(--text) 16%);
       background: color-mix(in srgb, var(--err) 14%, var(--card) 86%);
       border-color: color-mix(in srgb, var(--err) 34%, var(--line) 66%);
     }
 
-    .stack { display: flex; flex-direction: column; gap: 10px; }
+    .setting-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
     .auth-tabs {
       display: inline-flex;
+      align-items: center;
       gap: 6px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 4px;
-      background: var(--chip);
-      margin-bottom: 10px;
+      background: var(--chip-bg);
+      padding: 5px;
+      margin-bottom: 8px;
     }
 
     .auth-tab {
       border: 0;
       background: transparent;
       color: var(--muted);
+      font-size: 26px;
+      line-height: 1;
       border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 13px;
-      font-weight: 700;
+      padding: 8px 14px;
+      font-weight: 650;
       cursor: pointer;
     }
 
     .auth-tab.active {
+      background: color-mix(in srgb, var(--card) 90%, #000000 10%);
       color: var(--text);
-      background: color-mix(in srgb, var(--card) 90%, var(--bg-elev) 10%);
       border: 1px solid var(--line);
     }
 
     .auth-form { display: none; }
-    .auth-form.active { display: block; }
+    .auth-form.active { display: flex; }
 
     .field {
       width: 100%;
       border: 1px solid var(--line);
-      border-radius: 10px;
-      background: color-mix(in srgb, var(--card) 74%, var(--bg-elev) 26%);
+      background: var(--input-bg);
       color: var(--text);
-      padding: 11px 12px;
-      font-size: 14px;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 30px;
+      line-height: 1.1;
       outline: none;
       transition: border-color .15s ease, box-shadow .15s ease;
     }
 
-    .field::placeholder { color: color-mix(in srgb, var(--muted) 78%, transparent); }
+    .field::placeholder { color: color-mix(in srgb, var(--muted) 88%, transparent); }
 
     .field:focus {
       border-color: color-mix(in srgb, var(--primary) 70%, var(--line) 30%);
-      box-shadow: 0 0 0 3px var(--focus);
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    .domain-wrap {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .domain-suffix {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 11px 14px;
+      background: var(--chip-bg);
+      color: var(--primary);
+      font-size: 31px;
+      line-height: 1;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
     .btn {
       border: 1px solid transparent;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 700;
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 750;
       cursor: pointer;
-      transition: filter .15s ease, transform .05s ease;
+      transition: filter .15s ease;
     }
 
-    .btn:active { transform: translateY(1px); }
     .btn:hover { filter: brightness(1.05); }
-    .btn:disabled { opacity: .6; cursor: not-allowed; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .btn.primary {
       background: var(--primary);
       color: var(--primary-ink);
-      border-color: color-mix(in srgb, var(--primary) 75%, #000000 25%);
+      border-color: color-mix(in srgb, var(--primary) 70%, #000000 30%);
     }
 
-    .btn.ghost {
-      background: var(--chip);
+    .btn.secondary {
+      background: transparent;
       color: var(--text);
       border-color: var(--line);
     }
 
-    .domain-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .domain {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 10px 12px;
-      color: var(--primary);
-      font-weight: 700;
-      background: var(--chip);
-      white-space: nowrap;
-    }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .device-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 10px 12px;
-      background: color-mix(in srgb, var(--card) 92%, var(--bg-elev) 8%);
-    }
-
-    .muted { color: var(--muted); font-size: 13px; }
-
-    .section-title {
-      margin: 0 0 12px;
-      font-size: 28px;
+    .muted {
+      color: var(--muted);
+      font-size: 26px;
       line-height: 1.1;
-      letter-spacing: -0.02em;
     }
 
-    .panel-title {
-      margin: 0 0 12px;
-      font-size: 24px;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
+    @media (max-width: 1300px) {
+      .label { font-size: 20px; }
+      .kpi { font-size: 34px; }
+      .kpi-sm { font-size: 32px; }
+      .sub { font-size: 18px; }
+      .panel-title { font-size: 42px; }
+      .device-id { font-size: 30px; }
+      .device-sub { font-size: 18px; }
+      .status-pill { font-size: 20px; }
+      .flash { font-size: 18px; }
+      .auth-tab { font-size: 16px; }
+      .field { font-size: 18px; }
+      .btn { font-size: 24px; }
+      .domain-suffix { font-size: 19px; }
+      .muted { font-size: 15px; }
+      .subtitle { font-size: 26px; }
     }
 
     @media (max-width: 980px) {
-      .kpi { grid-column: span 6; }
-      .two-col { grid-template-columns: 1fr; }
+      .card { grid-column: span 6; }
+      .setting-grid { grid-template-columns: 1fr; }
+      .panel-title { font-size: 34px; }
     }
 
     @media (max-width: 700px) {
-      body { padding: 14px 10px 18px; }
-      .kpi { grid-column: 1 / -1; }
-      .section-title { font-size: 24px; }
-      .panel-title { font-size: 22px; }
-      .domain-wrap { flex-direction: column; align-items: stretch; }
-      .domain { text-align: center; }
+      .container { width: min(1280px, calc(100% - 12px)); }
+      .topbar-inner { min-height: 56px; }
+      .brand { font-size: 15px; }
+      .brand-logo { width: 24px; height: 24px; }
+      .nav-item { font-size: 12px; padding: 6px 10px; }
+      h1 { font-size: clamp(26px, 10vw, 44px); }
+      .subtitle { font-size: 18px; }
+      .card, .panel { padding: 14px; border-radius: 14px; }
+      .card { grid-column: 1 / -1; min-height: 120px; }
+      .label { font-size: 18px; margin-bottom: 8px; }
+      .kpi { font-size: 30px; }
+      .kpi-sm { font-size: 28px; }
+      .sub { font-size: 16px; }
+      .panel-title { font-size: 30px; }
+      .device-id { font-size: 22px; }
+      .device-sub { font-size: 15px; }
+      .status-pill { font-size: 16px; padding: 8px 12px; }
+      .dot { width: 10px; height: 10px; }
+      .flash { font-size: 16px; }
+      .field { font-size: 16px; padding: 10px 12px; }
+      .btn { font-size: 20px; }
+      .domain-suffix { font-size: 15px; }
+      .domain-wrap { grid-template-columns: 1fr; }
+      .muted { font-size: 14px; }
+      .user-box { width: 100%; justify-content: flex-end; }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <header class="topbar">
+  <header class="topbar">
+    <div class="container topbar-inner">
       <div class="brand">
         <img src="rp-home.svg" alt="RichPear logo" class="brand-logo" />
         <span>RichPear Home</span>
       </div>
       <nav class="nav">
-        <span class="nav-item">Prehled</span>
+        <span class="nav-item active">Prehled</span>
         <span class="nav-item">Moje zarizeni</span>
         <span class="nav-item">Subdomena</span>
         <span class="nav-item">Ucet</span>
       </nav>
-    </header>
+      {% if is_logged %}
+      <div class="user-box">
+        <span>{{ state.get("email", "") }}</span>
+        <form method="post" action="logout" style="margin:0;">
+          <button type="submit" class="logout-btn">Odhlasit</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </header>
 
-    <section class="hero">
-      <h1 class="section-title">RichPear Secure Tunnel</h1>
-      <p>Nastaveni pristupu z Home Assistanta do internetu.</p>
-    </section>
+  <main class="container page">
+    <h1>RichPear Secure Tunnel</h1>
+    <p class="subtitle">Nastaveni pristupu z Home Assistanta do internetu.</p>
 
     {% if flash_ok %}<div class="flash ok">{{ flash_ok }}</div>{% endif %}
     {% if flash_err %}<div class="flash err">{{ flash_err }}</div>{% endif %}
 
     <section class="grid">
-      <article class="card kpi">
+      <article class="card">
         <span class="label">Stav uctu</span>
-        <div class="value-sm">{% if is_logged %}{{ state.get("plan_status", "active") }}{% else %}neprihlasen{% endif %}</div>
+        <p class="kpi-sm">{% if is_logged %}{{ state.get("plan_status", "active") }}{% else %}neprihlasen{% endif %}</p>
         <div class="sub">{% if state.get("email") %}{{ state.get("email") }}{% else %}-{% endif %}</div>
       </article>
-      <article class="card kpi">
+      <article class="card">
         <span class="label">Zarizeni</span>
-        <div class="value">1</div>
+        <p class="kpi">1</p>
         <div class="sub">Home Assistant</div>
       </article>
-      <article class="card kpi">
+      <article class="card">
         <span class="label">Subdomena</span>
-        <div class="value-sm">{% if state.get("subdomain") %}{{ state.get("subdomain") }}{% else %}-{% endif %}</div>
+        <p class="kpi-sm">{% if state.get("subdomain") %}{{ state.get("subdomain") }}{% else %}-{% endif %}</p>
         <div class="sub">{% if state.get("full_domain") %}https://{{ state.get("full_domain") }}{% else %}Nenastavena{% endif %}</div>
       </article>
 
-      <article class="card panel">
+      <article class="panel">
         <h2 class="panel-title">Moje zarizeni</h2>
         <div class="device-row">
           <div>
-            <strong>{{ device_id }}</strong>
-            <div class="muted">Control plane: {{ control_plane_url }}</div>
+            <p class="device-id">{{ device_id }}</p>
+            <div class="device-sub">Control plane: {{ control_plane_url }}</div>
           </div>
-          {% if frpc_up %}<span class="status-pill up"><span class="dot"></span>Online</span>{% else %}<span class="status-pill down"><span class="dot"></span>Offline</span>{% endif %}
+          {% if frpc_up %}
+            <span class="status-pill up"><span class="dot"></span>Online</span>
+          {% else %}
+            <span class="status-pill down"><span class="dot"></span>Offline</span>
+          {% endif %}
         </div>
       </article>
 
-      <article class="card panel">
+      <article class="panel">
         <h2 class="panel-title">Nastaveni uctu a tunelu</h2>
-        <div class="two-col">
+        <div class="setting-grid">
           <section class="stack">
             <span class="label">Ucet zakaznika</span>
             {% if is_logged %}
-            <div class="flash ok">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status","-") }})</div>
+              <div class="flash ok">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status", "-") }})</div>
             {% else %}
-            <div class="auth-tabs">
-              <button type="button" class="auth-tab active" data-auth-tab="login">Prihlaseni</button>
-              <button type="button" class="auth-tab" data-auth-tab="signup">Registrace</button>
-            </div>
-            <form method="post" action="login" class="auth-form active stack" data-auth-form="login">
-              <input class="field" name="email" type="email" placeholder="E-mail" required />
-              <input class="field" name="password" type="password" placeholder="Heslo" required />
-              <button type="submit" class="btn primary">Prihlasit</button>
-            </form>
-            <form method="post" action="signup" class="auth-form stack" data-auth-form="signup">
-              <input class="field" name="email" type="email" placeholder="E-mail" required />
-              <input class="field" name="password" type="password" placeholder="Heslo (min 10, pismena + cisla)" required />
-              <button type="submit" class="btn primary">Registrovat</button>
-            </form>
+              <div class="auth-tabs">
+                <button type="button" class="auth-tab active" data-auth-tab="login">Prihlaseni</button>
+                <button type="button" class="auth-tab" data-auth-tab="signup">Registrace</button>
+              </div>
+              <form method="post" action="login" class="auth-form active stack" data-auth-form="login">
+                <input class="field" name="email" type="email" placeholder="E-mail" required />
+                <input class="field" name="password" type="password" placeholder="Heslo" required />
+                <button type="submit" class="btn primary">Prihlasit</button>
+              </form>
+              <form method="post" action="signup" class="auth-form stack" data-auth-form="signup">
+                <input class="field" name="email" type="email" placeholder="E-mail" required />
+                <input class="field" name="password" type="password" placeholder="Heslo (min 10, pismena + cisla)" required />
+                <button type="submit" class="btn primary">Registrovat</button>
+              </form>
             {% endif %}
           </section>
 
@@ -555,20 +685,20 @@ def index():
             <span class="label">Subdomena a pripojeni</span>
             <form method="post" action="connect" class="stack">
               <div class="domain-wrap">
-                <input class="field" style="flex:1; min-width:180px;" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
-                <span class="domain">.cz.richpear.cz</span>
+                <input class="field" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
+                <span class="domain-suffix">.cz.richpear.cz</span>
               </div>
               <button type="submit" class="btn primary" {% if not is_logged %}disabled{% endif %}>Pripojit tunel</button>
               {% if not is_logged %}<span class="muted">Nejdriv se registruj nebo prihlas.</span>{% endif %}
             </form>
-            <form method="post" action="restart" style="margin-top:6px;">
-              <button type="submit" class="btn ghost">Restart tunelu</button>
+            <form method="post" action="restart" style="margin-top:8px;">
+              <button type="submit" class="btn secondary">Restart tunelu</button>
             </form>
           </section>
         </div>
       </article>
     </section>
-  </div>
+  </main>
 
   <script>
     (function () {
@@ -611,11 +741,7 @@ def index():
 
       function resolveThemeSource(doc) {
         if (!doc) return null;
-        var candidates = [
-          doc.querySelector('home-assistant'),
-          doc.documentElement,
-          doc.body
-        ];
+        var candidates = [doc.querySelector('home-assistant'), doc.documentElement, doc.body];
         for (var i = 0; i < candidates.length; i++) {
           var el = candidates[i];
           if (!el) continue;
@@ -634,7 +760,7 @@ def index():
             if (val) document.documentElement.style.setProperty(name, val);
           });
         } catch (e) {
-          // Keep local light/dark fallbacks when parent styles are inaccessible.
+          // Keep local fallback palette when parent theme cannot be accessed.
         }
       }
 
@@ -683,6 +809,15 @@ def login():
     state["plan_status"] = data.get("plan_status", "trial")
     save_state(state)
     return ingress_redirect(ok="Prihlaseni probehlo uspesne")
+
+
+@APP.post("/logout")
+def logout():
+    state = load_state()
+    state.pop("access_token", None)
+    state.pop("plan_status", None)
+    save_state(state)
+    return ingress_redirect(ok="Odhlaseni probehlo uspesne")
 
 
 @APP.post("/connect")

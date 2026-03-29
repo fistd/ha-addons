@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.14
+
+- Reworked addon UI to mirror the RichPear web dashboard structure much more closely: sticky top bar, dashboard card composition, and matching hierarchy.
+- Added direct logout action in addon UI so account behavior matches portal expectations.
+- Kept HA theme sync, while preserving clear dark/light fallback styling.
+
 ## 0.2.13
 
 - Redesigned add-on onboarding UI to match RichPear client dashboard style more closely (top bar, KPI cards, panel hierarchy, spacing).
