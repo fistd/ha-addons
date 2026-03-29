@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.12
+
+- Fixed add-on header branding: replaced unintended Home Assistant icon with RichPear logo asset.
+
 ## 0.2.11
 
 - Improved visual parity with client portal: matching fonts (Inter/Space Grotesk), logo usage, and cleaner dashboard-like cards.
