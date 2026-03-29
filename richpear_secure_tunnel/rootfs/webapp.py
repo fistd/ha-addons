@@ -221,6 +221,8 @@ def index():
     }
 
     .nav-item {
+      display: inline-flex;
+      align-items: center;
       border: 1px solid var(--line);
       background: var(--chip);
       color: var(--muted);
@@ -229,6 +231,9 @@ def index():
       font-size: 13px;
       line-height: 1;
       white-space: nowrap;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .15s ease, color .15s ease, border-color .15s ease;
     }
 
     .nav-item.active {
@@ -584,11 +589,11 @@ def index():
     <div class="container top-inner">
       <div class="brand"><img src="rp-home.svg" alt="RichPear logo" />RichPear Home</div>
       <nav class="nav">
-        <span class="nav-item active">Prehled</span>
-        <span class="nav-item">Moje zarizeni</span>
-        <span class="nav-item">Subdomena</span>
-        <span class="nav-item">Ucet</span>
-        <span class="nav-item">Fakturacni udaje</span>
+        <a class="nav-item active" href="#overview" data-nav="overview">Prehled</a>
+        <a class="nav-item" href="#devices" data-nav="devices">Moje zarizeni</a>
+        <a class="nav-item" href="#settings" data-nav="subdomain">Subdomena</a>
+        <a class="nav-item" href="#settings" data-nav="account">Ucet</a>
+        <a class="nav-item" href="#settings" data-nav="billing">Fakturacni udaje</a>
       </nav>
       {% if is_logged %}
       <div class="user">
@@ -600,7 +605,7 @@ def index():
   </header>
 
   <main class="container main">
-    <section class="greet">
+    <section class="greet" id="overview">
       <h1>Ahoj, {% if state.get("email") %}{{ state.get("email").split("@")[0] }}{% else %}uzivateli{% endif %} 👋</h1>
       <p>Prehled vaseho uctu a zarizeni.</p>
     </section>
@@ -625,7 +630,7 @@ def index():
         <div class="kpi-sub">{% if state.get("full_domain") %}{{ state.get("full_domain") }}{% else %}Nenastavena{% endif %}</div>
       </article>
 
-      <article class="panel">
+      <article class="panel" id="devices">
         <h2 class="panel-h">Moje zarizeni</h2>
         <div class="panel-b">
           <div class="device-row">
@@ -638,7 +643,7 @@ def index():
         </div>
       </article>
 
-      <article class="settings-wrap">
+      <article class="settings-wrap" id="settings">
         <details class="settings-details">
           <summary class="settings-summary">Nastaveni uctu a tunelu</summary>
           <div class="panel-b settings-grid">
@@ -668,7 +673,7 @@ def index():
               <h3 class="sub-title">Subdomena a pripojeni</h3>
               <form method="post" action="connect" class="stack">
                 <div class="domain">
-                  <input class="field" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
+                  <input id="subdomain-input" class="field" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
                   <span class="suffix">.cz.richpear.cz</span>
                 </div>
                 <button type="submit" class="btn primary" {% if not is_logged %}disabled{% endif %}>Pripojit tunel</button>
@@ -691,6 +696,50 @@ def index():
         forms.forEach(function (form) { form.classList.toggle('active', form.getAttribute('data-auth-form') === mode); });
       }
       tabs.forEach(function (tab) { tab.addEventListener('click', function () { setMode(tab.getAttribute('data-auth-tab')); }); });
+
+      var navItems = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
+      var settingsDetails = document.querySelector('.settings-details');
+      var subdomainInput = document.getElementById('subdomain-input');
+
+      function setActiveNav(name) {
+        navItems.forEach(function (item) {
+          item.classList.toggle('active', item.getAttribute('data-nav') === name);
+        });
+      }
+
+      navItems.forEach(function (item) {
+        item.addEventListener('click', function () {
+          var name = item.getAttribute('data-nav');
+          if (name === 'subdomain' || name === 'account' || name === 'billing') {
+            if (settingsDetails) settingsDetails.open = true;
+            if (name === 'subdomain' && subdomainInput) {
+              setTimeout(function () { subdomainInput.focus(); }, 120);
+            }
+          }
+          setActiveNav(name === 'subdomain' || name === 'account' || name === 'billing' ? name : name);
+        });
+      });
+
+      function detectSectionNav() {
+        var y = window.scrollY || window.pageYOffset;
+        var settings = document.getElementById('settings');
+        var devices = document.getElementById('devices');
+        if (settings && y >= settings.offsetTop - 120) {
+          var active = 'account';
+          var focused = document.activeElement && document.activeElement.id === 'subdomain-input';
+          if (focused) active = 'subdomain';
+          setActiveNav(active);
+          return;
+        }
+        if (devices && y >= devices.offsetTop - 120) {
+          setActiveNav('devices');
+          return;
+        }
+        setActiveNav('overview');
+      }
+
+      window.addEventListener('scroll', detectSectionNav, { passive: true });
+      detectSectionNav();
 
       var THEME_VARS = [
         '--primary-background-color', '--secondary-background-color', '--card-background-color',

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.17
+
+- Fixed top navigation to be truly functional in the addon UI (clickable section navigation and active tab state).
+- Clicking `Subdomena`, `Ucet`, or `Fakturacni udaje` now opens the settings section automatically.
+- Minor visual tuning of nav chips/spacing for closer dashboard parity.
+
 ## 0.2.16
 
 - Tuned addon dashboard visual parity with the client portal (header scale, nav chip sizing, greeting and section proportions).
