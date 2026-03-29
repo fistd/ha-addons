@@ -133,31 +133,31 @@ def index():
   <style>
     :root {
       color-scheme: light dark;
-      --bg-main: var(--primary-background-color, #0c1017);
-      --card: var(--card-background-color, #181b22);
-      --line: var(--divider-color, #2a313d);
-      --text: var(--primary-text-color, #f2f5fa);
-      --muted: var(--secondary-text-color, #9ba4b4);
-      --primary: var(--primary-color, #17a864);
-      --primary-ink: var(--text-primary-color, #e7f7ee);
-      --ok: var(--success-color, #2bbf67);
-      --err: var(--error-color, #e24f4f);
-      --chip-bg: color-mix(in srgb, var(--card) 80%, #111827 20%);
-      --input-bg: color-mix(in srgb, var(--card) 90%, #0f131a 10%);
-      --focus: color-mix(in srgb, var(--primary) 34%, transparent);
+      --bg: var(--primary-background-color, #0b101a);
+      --card: var(--card-background-color, #151b28);
+      --line: var(--divider-color, #2b3344);
+      --text: var(--primary-text-color, #edf2ff);
+      --muted: var(--secondary-text-color, #98a3b8);
+      --primary: var(--primary-color, #19b46f);
+      --primary-ink: var(--text-primary-color, #07160f);
+      --ok: var(--success-color, #2abb67);
+      --err: var(--error-color, #df4b4b);
+      --chip: color-mix(in srgb, var(--card) 78%, #0f1420 22%);
+      --input: color-mix(in srgb, var(--card) 90%, #0f1420 10%);
+      --focus: color-mix(in srgb, var(--primary) 35%, transparent);
     }
 
     @media (prefers-color-scheme: light) {
       :root {
-        --bg-main: var(--primary-background-color, #f3f6fb);
+        --bg: var(--primary-background-color, #f3f6fb);
         --card: var(--card-background-color, #ffffff);
-        --line: var(--divider-color, #d7deea);
+        --line: var(--divider-color, #d8e0ef);
         --text: var(--primary-text-color, #0f172a);
-        --muted: var(--secondary-text-color, #5f6b7d);
-        --primary: var(--primary-color, #138d5e);
+        --muted: var(--secondary-text-color, #607088);
+        --primary: var(--primary-color, #128b5d);
         --primary-ink: var(--text-primary-color, #ffffff);
-        --chip-bg: color-mix(in srgb, var(--card) 56%, #edf2f8 44%);
-        --input-bg: color-mix(in srgb, var(--card) 88%, #edf3fb 12%);
+        --chip: color-mix(in srgb, var(--card) 52%, #ecf1f8 48%);
+        --input: color-mix(in srgb, var(--card) 90%, #eef4fb 10%);
       }
     }
 
@@ -168,77 +168,77 @@ def index():
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 28%),
-        linear-gradient(180deg, var(--bg-main), color-mix(in srgb, var(--bg-main) 80%, #070b12 20%));
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      backdrop-filter: blur(8px);
-      background: color-mix(in srgb, var(--card) 92%, transparent);
-      border-bottom: 1px solid var(--line);
+        radial-gradient(circle at 14% -6%, color-mix(in srgb, var(--primary) 13%, transparent), transparent 35%),
+        linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--bg) 80%, #060b12 20%));
     }
 
     .container {
-      width: min(1280px, calc(100% - 22px));
+      width: min(1120px, calc(100% - 24px));
       margin: 0 auto;
     }
 
-    .topbar-inner {
-      min-height: 64px;
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+    }
+
+    .top-inner {
+      min-height: 58px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
-      padding: 10px 0;
+      padding: 8px 0;
     }
 
     .brand {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      text-decoration: none;
-      color: var(--text);
       font-weight: 700;
-      font-size: 18px;
+      font-size: 28px;
+      letter-spacing: -0.01em;
     }
 
-    .brand-logo {
+    .brand img {
       width: 30px;
       height: 30px;
       object-fit: contain;
-      display: block;
       border-radius: 6px;
+      display: block;
     }
 
     .nav {
       display: flex;
-      align-items: center;
       gap: 8px;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .nav-item {
-      padding: 7px 14px;
-      border-radius: 999px;
       border: 1px solid var(--line);
-      background: var(--chip-bg);
+      background: var(--chip);
       color: var(--muted);
-      font-size: 14px;
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 15px;
       line-height: 1;
+      white-space: nowrap;
     }
 
     .nav-item.active {
-      background: color-mix(in srgb, var(--primary) 20%, var(--card) 80%);
-      border-color: color-mix(in srgb, var(--primary) 45%, var(--line) 55%);
+      background: color-mix(in srgb, var(--primary) 18%, var(--card) 82%);
+      border-color: color-mix(in srgb, var(--primary) 40%, var(--line) 60%);
       color: var(--primary);
-      font-weight: 600;
+      font-weight: 700;
     }
 
-    .user-box {
+    .user {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -246,217 +246,220 @@ def index():
       font-size: 14px;
     }
 
-    .logout-btn {
+    .logout {
       border: 1px solid var(--line);
       background: transparent;
       color: var(--text);
       border-radius: 10px;
-      padding: 7px 11px;
+      padding: 6px 10px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
     }
 
-    .page {
-      padding: 24px 0 30px;
+    .main { padding: 20px 0 28px; }
+
+    .greet {
+      margin-bottom: 14px;
     }
 
-    h1 {
+    .greet h1 {
       margin: 0;
-      font-size: clamp(35px, 4.2vw, 56px);
-      line-height: 1.03;
-      letter-spacing: -0.03em;
-      font-weight: 800;
-    }
-
-    .subtitle {
-      margin: 8px 0 18px;
-      color: var(--muted);
-      font-size: 34px;
+      font-size: 38px;
       line-height: 1.08;
       letter-spacing: -0.02em;
-      font-weight: 700;
+    }
+
+    .greet p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .flash {
+      margin-bottom: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    .flash.ok {
+      color: color-mix(in srgb, var(--ok) 83%, var(--text) 17%);
+      background: color-mix(in srgb, var(--ok) 18%, var(--card) 82%);
+      border-color: color-mix(in srgb, var(--ok) 35%, var(--line) 65%);
+    }
+
+    .flash.err {
+      color: color-mix(in srgb, var(--err) 86%, var(--text) 14%);
+      background: color-mix(in srgb, var(--err) 14%, var(--card) 86%);
+      border-color: color-mix(in srgb, var(--err) 36%, var(--line) 64%);
     }
 
     .grid {
       display: grid;
-      gap: 14px;
       grid-template-columns: repeat(12, minmax(0, 1fr));
-    }
-
-    .card {
-      grid-column: span 4;
-      border: 1px solid var(--line);
-      background: var(--card);
-      border-radius: 18px;
-      padding: 20px;
-      min-height: 150px;
-    }
-
-    .label {
-      color: var(--muted);
-      font-size: 34px;
-      line-height: 1.05;
-      font-weight: 650;
-      letter-spacing: -0.02em;
-      margin-bottom: 14px;
-      display: block;
+      gap: 12px;
     }
 
     .kpi {
-      font-size: 52px;
-      line-height: 1;
-      letter-spacing: -0.035em;
-      font-weight: 800;
-      margin: 0;
+      grid-column: span 4;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--card);
+      padding: 16px;
+      min-height: 126px;
     }
 
-    .kpi-sm {
-      font-size: 44px;
+    .kpi-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .kpi-title {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .kpi-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--primary) 16%, transparent);
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .kpi-value {
+      margin: 0;
+      font-size: 38px;
       line-height: 1;
       letter-spacing: -0.03em;
       font-weight: 800;
-      margin: 0;
-      word-break: break-word;
     }
 
-    .sub {
+    .kpi-sub {
+      margin-top: 7px;
       color: var(--muted);
-      font-size: 28px;
-      line-height: 1.12;
-      margin-top: 10px;
+      font-size: 13px;
       word-break: break-word;
     }
 
     .panel {
       grid-column: 1 / -1;
       border: 1px solid var(--line);
+      border-radius: 12px;
       background: var(--card);
-      border-radius: 18px;
-      padding: 20px;
     }
 
-    .panel-title {
-      margin: 0 0 14px;
-      font-size: 50px;
+    .panel-h {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 34px;
       line-height: 1;
-      letter-spacing: -0.03em;
-      font-weight: 800;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    .panel-b {
+      padding: 14px 16px;
     }
 
     .device-row {
       border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 14px 16px;
+      border-radius: 10px;
+      padding: 10px 12px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       gap: 12px;
-      min-height: 86px;
     }
 
     .device-id {
-      font-size: 36px;
-      line-height: 1.06;
-      font-weight: 780;
-      letter-spacing: -0.02em;
+      font-size: 18px;
+      font-weight: 700;
       margin: 0;
+      letter-spacing: -0.01em;
       word-break: break-word;
     }
 
     .device-sub {
+      margin-top: 4px;
       color: var(--muted);
-      font-size: 29px;
-      line-height: 1.1;
-      margin-top: 6px;
+      font-size: 13px;
       word-break: break-word;
     }
 
-    .status-pill {
+    .status {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       border-radius: 999px;
+      padding: 5px 10px;
       border: 1px solid transparent;
-      font-size: 30px;
-      line-height: 1;
+      font-size: 12px;
       font-weight: 700;
-      padding: 10px 18px;
       white-space: nowrap;
     }
 
-    .status-pill.up {
-      background: color-mix(in srgb, var(--ok) 18%, transparent);
-      border-color: color-mix(in srgb, var(--ok) 40%, var(--line) 60%);
+    .status.up {
       color: color-mix(in srgb, var(--ok) 88%, #ffffff 12%);
+      background: color-mix(in srgb, var(--ok) 18%, transparent);
+      border-color: color-mix(in srgb, var(--ok) 35%, var(--line) 65%);
     }
 
-    .status-pill.down {
-      background: color-mix(in srgb, var(--err) 16%, transparent);
-      border-color: color-mix(in srgb, var(--err) 36%, var(--line) 64%);
-      color: color-mix(in srgb, var(--err) 90%, #ffffff 10%);
+    .status.down {
+      color: color-mix(in srgb, var(--err) 88%, #ffffff 12%);
+      background: color-mix(in srgb, var(--err) 14%, transparent);
+      border-color: color-mix(in srgb, var(--err) 35%, var(--line) 65%);
     }
 
-    .dot {
-      width: 14px;
-      height: 14px;
+    .status-dot {
+      width: 7px;
+      height: 7px;
       border-radius: 999px;
       background: currentColor;
     }
 
-    .flash {
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      padding: 14px 16px;
-      font-size: 31px;
-      line-height: 1.08;
-      margin-bottom: 14px;
-    }
-
-    .flash.ok {
-      color: color-mix(in srgb, var(--ok) 82%, var(--text) 18%);
-      background: color-mix(in srgb, var(--ok) 18%, var(--card) 82%);
-      border-color: color-mix(in srgb, var(--ok) 35%, var(--line) 65%);
-    }
-
-    .flash.err {
-      color: color-mix(in srgb, var(--err) 84%, var(--text) 16%);
-      background: color-mix(in srgb, var(--err) 14%, var(--card) 86%);
-      border-color: color-mix(in srgb, var(--err) 34%, var(--line) 66%);
-    }
-
-    .setting-grid {
+    .settings-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      gap: 12px;
     }
 
-    .stack {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .sub-title {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
     }
+
+    .stack { display: flex; flex-direction: column; gap: 10px; }
 
     .auth-tabs {
       display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      gap: 5px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: var(--chip-bg);
-      padding: 5px;
-      margin-bottom: 8px;
+      background: var(--chip);
+      padding: 4px;
     }
 
     .auth-tab {
       border: 0;
       background: transparent;
       color: var(--muted);
-      font-size: 26px;
-      line-height: 1;
       border-radius: 999px;
-      padding: 8px 14px;
-      font-weight: 650;
+      padding: 7px 11px;
+      font-size: 13px;
+      font-weight: 700;
       cursor: pointer;
     }
 
@@ -472,197 +475,147 @@ def index():
     .field {
       width: 100%;
       border: 1px solid var(--line);
-      background: var(--input-bg);
+      background: var(--input);
       color: var(--text);
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 30px;
-      line-height: 1.1;
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 14px;
       outline: none;
       transition: border-color .15s ease, box-shadow .15s ease;
     }
 
-    .field::placeholder { color: color-mix(in srgb, var(--muted) 88%, transparent); }
-
     .field:focus {
-      border-color: color-mix(in srgb, var(--primary) 70%, var(--line) 30%);
-      box-shadow: 0 0 0 4px var(--focus);
+      border-color: color-mix(in srgb, var(--primary) 68%, var(--line) 32%);
+      box-shadow: 0 0 0 3px var(--focus);
     }
 
-    .domain-wrap {
+    .domain {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 10px;
       align-items: center;
     }
 
-    .domain-suffix {
+    .suffix {
       border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 11px 14px;
-      background: var(--chip-bg);
+      background: var(--chip);
       color: var(--primary);
-      font-size: 31px;
-      line-height: 1;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
       font-weight: 700;
-      white-space: nowrap;
     }
 
     .btn {
+      border-radius: 10px;
       border: 1px solid transparent;
-      border-radius: 12px;
-      padding: 13px 16px;
-      font-size: 34px;
-      line-height: 1;
-      font-weight: 750;
+      padding: 10px 14px;
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
-      transition: filter .15s ease;
     }
-
-    .btn:hover { filter: brightness(1.05); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .btn.primary {
       background: var(--primary);
       color: var(--primary-ink);
-      border-color: color-mix(in srgb, var(--primary) 70%, #000000 30%);
+      border-color: color-mix(in srgb, var(--primary) 68%, #000000 32%);
     }
 
-    .btn.secondary {
+    .btn.ghost {
       background: transparent;
       color: var(--text);
       border-color: var(--line);
     }
 
-    .muted {
-      color: var(--muted);
-      font-size: 26px;
-      line-height: 1.1;
-    }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
 
-    @media (max-width: 1300px) {
-      .label { font-size: 20px; }
-      .kpi { font-size: 34px; }
-      .kpi-sm { font-size: 32px; }
-      .sub { font-size: 18px; }
-      .panel-title { font-size: 42px; }
-      .device-id { font-size: 30px; }
-      .device-sub { font-size: 18px; }
-      .status-pill { font-size: 20px; }
-      .flash { font-size: 18px; }
-      .auth-tab { font-size: 16px; }
-      .field { font-size: 18px; }
-      .btn { font-size: 24px; }
-      .domain-suffix { font-size: 19px; }
-      .muted { font-size: 15px; }
-      .subtitle { font-size: 26px; }
-    }
+    .muted { color: var(--muted); font-size: 13px; }
 
     @media (max-width: 980px) {
-      .card { grid-column: span 6; }
-      .setting-grid { grid-template-columns: 1fr; }
-      .panel-title { font-size: 34px; }
+      .kpi { grid-column: span 6; }
+      .settings-grid { grid-template-columns: 1fr; }
+      .brand { font-size: 20px; }
     }
 
-    @media (max-width: 700px) {
-      .container { width: min(1280px, calc(100% - 12px)); }
-      .topbar-inner { min-height: 56px; }
-      .brand { font-size: 15px; }
-      .brand-logo { width: 24px; height: 24px; }
-      .nav-item { font-size: 12px; padding: 6px 10px; }
-      h1 { font-size: clamp(26px, 10vw, 44px); }
-      .subtitle { font-size: 18px; }
-      .card, .panel { padding: 14px; border-radius: 14px; }
-      .card { grid-column: 1 / -1; min-height: 120px; }
-      .label { font-size: 18px; margin-bottom: 8px; }
-      .kpi { font-size: 30px; }
-      .kpi-sm { font-size: 28px; }
-      .sub { font-size: 16px; }
-      .panel-title { font-size: 30px; }
-      .device-id { font-size: 22px; }
-      .device-sub { font-size: 15px; }
-      .status-pill { font-size: 16px; padding: 8px 12px; }
-      .dot { width: 10px; height: 10px; }
-      .flash { font-size: 16px; }
-      .field { font-size: 16px; padding: 10px 12px; }
-      .btn { font-size: 20px; }
-      .domain-suffix { font-size: 15px; }
-      .domain-wrap { grid-template-columns: 1fr; }
-      .muted { font-size: 14px; }
-      .user-box { width: 100%; justify-content: flex-end; }
+    @media (max-width: 720px) {
+      .container { width: min(1120px, calc(100% - 14px)); }
+      .top-inner { min-height: 54px; }
+      .brand { font-size: 18px; }
+      .brand img { width: 26px; height: 26px; }
+      .kpi { grid-column: 1 / -1; }
+      .panel-h { font-size: 28px; }
+      .greet h1 { font-size: 30px; }
+      .domain { grid-template-columns: 1fr; }
+      .user { width: 100%; justify-content: flex-end; }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="container topbar-inner">
-      <div class="brand">
-        <img src="rp-home.svg" alt="RichPear logo" class="brand-logo" />
-        <span>RichPear Home</span>
-      </div>
+  <header class="top">
+    <div class="container top-inner">
+      <div class="brand"><img src="rp-home.svg" alt="RichPear logo" />RichPear Home</div>
       <nav class="nav">
         <span class="nav-item active">Prehled</span>
         <span class="nav-item">Moje zarizeni</span>
         <span class="nav-item">Subdomena</span>
         <span class="nav-item">Ucet</span>
+        <span class="nav-item">Fakturacni udaje</span>
       </nav>
       {% if is_logged %}
-      <div class="user-box">
+      <div class="user">
         <span>{{ state.get("email", "") }}</span>
-        <form method="post" action="logout" style="margin:0;">
-          <button type="submit" class="logout-btn">Odhlasit</button>
-        </form>
+        <form method="post" action="logout" style="margin:0;"><button class="logout" type="submit">Odhlasit</button></form>
       </div>
       {% endif %}
     </div>
   </header>
 
-  <main class="container page">
-    <h1>RichPear Secure Tunnel</h1>
-    <p class="subtitle">Nastaveni pristupu z Home Assistanta do internetu.</p>
+  <main class="container main">
+    <section class="greet">
+      <h1>Ahoj, {% if state.get("email") %}{{ state.get("email").split("@")[0] }}{% else %}uzivateli{% endif %} 👋</h1>
+      <p>Prehled vaseho uctu a zarizeni.</p>
+    </section>
 
     {% if flash_ok %}<div class="flash ok">{{ flash_ok }}</div>{% endif %}
     {% if flash_err %}<div class="flash err">{{ flash_err }}</div>{% endif %}
 
     <section class="grid">
-      <article class="card">
-        <span class="label">Stav uctu</span>
-        <p class="kpi-sm">{% if is_logged %}{{ state.get("plan_status", "active") }}{% else %}neprihlasen{% endif %}</p>
-        <div class="sub">{% if state.get("email") %}{{ state.get("email") }}{% else %}-{% endif %}</div>
+      <article class="kpi">
+        <div class="kpi-head"><span class="kpi-title">Stav uctu</span><span class="kpi-icon">◻</span></div>
+        <p class="kpi-value">{% if is_logged %}{{ state.get("plan_status", "active") }}{% else %}guest{% endif %}</p>
+        <div class="kpi-sub">{% if state.get("email") %}{{ state.get("email") }}{% else %}—{% endif %}</div>
       </article>
-      <article class="card">
-        <span class="label">Zarizeni</span>
-        <p class="kpi">1</p>
-        <div class="sub">Home Assistant</div>
+      <article class="kpi">
+        <div class="kpi-head"><span class="kpi-title">Zarizeni</span><span class="kpi-icon">⌂</span></div>
+        <p class="kpi-value">1</p>
+        <div class="kpi-sub">{% if frpc_up %}+1 1 online{% else %}0 online{% endif %}</div>
       </article>
-      <article class="card">
-        <span class="label">Subdomena</span>
-        <p class="kpi-sm">{% if state.get("subdomain") %}{{ state.get("subdomain") }}{% else %}-{% endif %}</p>
-        <div class="sub">{% if state.get("full_domain") %}https://{{ state.get("full_domain") }}{% else %}Nenastavena{% endif %}</div>
+      <article class="kpi">
+        <div class="kpi-head"><span class="kpi-title">Subdomena</span><span class="kpi-icon">◎</span></div>
+        <p class="kpi-value">{% if state.get("subdomain") %}{{ state.get("subdomain") }}{% else %}—{% endif %}</p>
+        <div class="kpi-sub">{% if state.get("full_domain") %}{{ state.get("full_domain") }}{% else %}Nenastavena{% endif %}</div>
       </article>
 
       <article class="panel">
-        <h2 class="panel-title">Moje zarizeni</h2>
-        <div class="device-row">
-          <div>
-            <p class="device-id">{{ device_id }}</p>
-            <div class="device-sub">Control plane: {{ control_plane_url }}</div>
+        <h2 class="panel-h">Moje zarizeni</h2>
+        <div class="panel-b">
+          <div class="device-row">
+            <div>
+              <p class="device-id">{{ device_id }}</p>
+              <div class="device-sub">Control plane: {{ control_plane_url }}</div>
+            </div>
+            {% if frpc_up %}<span class="status up"><span class="status-dot"></span>Online</span>{% else %}<span class="status down"><span class="status-dot"></span>Offline</span>{% endif %}
           </div>
-          {% if frpc_up %}
-            <span class="status-pill up"><span class="dot"></span>Online</span>
-          {% else %}
-            <span class="status-pill down"><span class="dot"></span>Offline</span>
-          {% endif %}
         </div>
       </article>
 
       <article class="panel">
-        <h2 class="panel-title">Nastaveni uctu a tunelu</h2>
-        <div class="setting-grid">
+        <h2 class="panel-h">Nastaveni uctu a tunelu</h2>
+        <div class="panel-b settings-grid">
           <section class="stack">
-            <span class="label">Ucet zakaznika</span>
+            <h3 class="sub-title">Ucet zakaznika</h3>
             {% if is_logged %}
-              <div class="flash ok">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status", "-") }})</div>
+              <div class="flash ok" style="margin:0;">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status", "-") }})</div>
             {% else %}
               <div class="auth-tabs">
                 <button type="button" class="auth-tab active" data-auth-tab="login">Prihlaseni</button>
@@ -682,18 +635,16 @@ def index():
           </section>
 
           <section class="stack">
-            <span class="label">Subdomena a pripojeni</span>
+            <h3 class="sub-title">Subdomena a pripojeni</h3>
             <form method="post" action="connect" class="stack">
-              <div class="domain-wrap">
+              <div class="domain">
                 <input class="field" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
-                <span class="domain-suffix">.cz.richpear.cz</span>
+                <span class="suffix">.cz.richpear.cz</span>
               </div>
               <button type="submit" class="btn primary" {% if not is_logged %}disabled{% endif %}>Pripojit tunel</button>
               {% if not is_logged %}<span class="muted">Nejdriv se registruj nebo prihlas.</span>{% endif %}
             </form>
-            <form method="post" action="restart" style="margin-top:8px;">
-              <button type="submit" class="btn secondary">Restart tunelu</button>
-            </form>
+            <form method="post" action="restart" style="margin-top:8px;"><button type="submit" class="btn ghost">Restart tunelu</button></form>
           </section>
         </div>
       </article>
@@ -704,33 +655,16 @@ def index():
     (function () {
       var tabs = document.querySelectorAll('[data-auth-tab]');
       var forms = document.querySelectorAll('[data-auth-form]');
-
       function setMode(mode) {
-        tabs.forEach(function (tab) {
-          tab.classList.toggle('active', tab.getAttribute('data-auth-tab') === mode);
-        });
-        forms.forEach(function (form) {
-          form.classList.toggle('active', form.getAttribute('data-auth-form') === mode);
-        });
+        tabs.forEach(function (tab) { tab.classList.toggle('active', tab.getAttribute('data-auth-tab') === mode); });
+        forms.forEach(function (form) { form.classList.toggle('active', form.getAttribute('data-auth-form') === mode); });
       }
-
-      tabs.forEach(function (tab) {
-        tab.addEventListener('click', function () {
-          setMode(tab.getAttribute('data-auth-tab'));
-        });
-      });
+      tabs.forEach(function (tab) { tab.addEventListener('click', function () { setMode(tab.getAttribute('data-auth-tab')); }); });
 
       var THEME_VARS = [
-        '--primary-background-color',
-        '--secondary-background-color',
-        '--card-background-color',
-        '--divider-color',
-        '--primary-text-color',
-        '--secondary-text-color',
-        '--primary-color',
-        '--text-primary-color',
-        '--success-color',
-        '--error-color'
+        '--primary-background-color', '--secondary-background-color', '--card-background-color',
+        '--divider-color', '--primary-text-color', '--secondary-text-color', '--primary-color',
+        '--text-primary-color', '--success-color', '--error-color'
       ];
 
       function firstNonEmptyVar(el, name) {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.15
+
+- Rebuilt add-on page layout directly from the RichPear client dashboard structure (greeting block, KPI cards, dashboard proportions).
+- Added full top navigation parity including `Fakturacni udaje` item and kept logged-in user + logout action in header.
+- Preserved add-on specific tunnel/account controls in a dedicated panel below the dashboard cards.
+
 ## 0.2.14
 
 - Reworked addon UI to mirror the RichPear web dashboard structure much more closely: sticky top bar, dashboard card composition, and matching hierarchy.
