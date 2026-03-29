@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.21
+
+- Renamed `Subdoména` to `Moje adresa` across addon dashboard navigation and cards.
+- Locked address changes after first successful setup: users can set address only once.
+- Added both UI lock and backend guard (`/connect`) to prevent changing address later.
+
 ## 0.2.20
 
 - Fixed onboarding auth switching so only one form is visible at a time (`Přihlášení` or `Registrace`).

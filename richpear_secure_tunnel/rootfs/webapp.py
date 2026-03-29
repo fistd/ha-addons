@@ -685,7 +685,7 @@ def index():
       <nav class="nav">
         <a class="nav-item active" href="#" data-nav="overview">Přehled</a>
         <a class="nav-item" href="#" data-nav="devices">Moje zařízení</a>
-        <a class="nav-item" href="#" data-nav="subdomain">Subdoména</a>
+        <a class="nav-item" href="#" data-nav="subdomain">Moje adresa</a>
         <a class="nav-item" href="#" data-nav="account">Účet</a>
         <a class="nav-item" href="#" data-nav="billing">Fakturační údaje</a>
       </nav>
@@ -719,7 +719,7 @@ def index():
       </a>
 
       <a class="kpi" href="#" data-goto="subdomain">
-        <div class="kpi-head"><span class="kpi-title">Subdoména</span><span class="kpi-icon">◎</span></div>
+        <div class="kpi-head"><span class="kpi-title">Moje adresa</span><span class="kpi-icon">◎</span></div>
         <p class="kpi-value">{% if state.get("subdomain") %}{{ state.get("subdomain") }}{% else %}—{% endif %}</p>
         <div class="kpi-sub">{% if state.get("full_domain") %}{{ state.get("full_domain") }}{% else %}Nenastavená{% endif %}</div>
       </a>
@@ -739,16 +739,19 @@ def index():
       </article>
 
       <article class="section" id="section-subdomain" data-section="subdomain">
-        <h2 class="section-h">Subdoména</h2>
+        <h2 class="section-h">Moje adresa</h2>
         <div class="section-b settings-grid">
           <section class="stack">
-            <h3 class="sub-title">Subdoména a připojení</h3>
+            <h3 class="sub-title">Moje adresa a připojení</h3>
             <form method="post" action="connect" class="stack">
               <div class="domain">
-                <input id="subdomain-input" class="field" name="subdomain" type="text" placeholder="např. rphome" value="{{ state.get('subdomain','') }}" required />
+                <input id="subdomain-input" class="field" name="subdomain" type="text" placeholder="např. rphome" value="{{ state.get('subdomain','') }}" required {% if subdomain_locked %}disabled{% endif %} />
                 <span class="suffix">.cz.richpear.cz</span>
               </div>
-              <button type="submit" class="btn primary">Připojit tunel</button>
+              <button type="submit" class="btn primary" {% if subdomain_locked %}disabled{% endif %}>Připojit tunel</button>
+              {% if subdomain_locked %}
+              <span class="muted">Moje adresa je již nastavená a nelze ji změnit.</span>
+              {% endif %}
             </form>
             <form method="post" action="restart" style="margin-top:8px;"><button type="submit" class="btn ghost">Restart tunelu</button></form>
           </section>
@@ -884,6 +887,7 @@ def index():
         flash_err=request.args.get("err", ""),
         username=username,
         now=__import__("datetime").datetime.now().strftime("%d. %m. %Y %H:%M:%S"),
+        subdomain_locked=bool(state.get("subdomain")),
     )
 
 
@@ -933,6 +937,8 @@ def connect():
     token = state.get("access_token", "")
     if not token:
         return ingress_redirect(err="Nejdřív se přihlas nebo zaregistruj")
+    if state.get("subdomain"):
+        return ingress_redirect(err="Moje adresa je již nastavená a nelze ji změnit")
     payload = {
         "device_id": load_device_id(),
         "subdomain": subdomain,
