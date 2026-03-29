@@ -7,7 +7,7 @@ import urllib.request
 import urllib.parse
 from pathlib import Path
 
-from flask import Flask, redirect, render_template_string, request, send_file, url_for
+from flask import Flask, redirect, render_template_string, request, send_file
 
 
 APP = Flask(__name__)
@@ -67,18 +67,18 @@ def api_post(path: str, payload: dict, bearer_token: str | None = None) -> tuple
 
 
 def write_frpc_config(subdomain: str, frp_server: str, frp_port: int, frp_token: str) -> None:
-    content = f"""serverAddr = "{frp_server}"
+    content = f"""serverAddr = \"{frp_server}\"
 serverPort = {frp_port}
-user = "{subdomain}"
-metadatas.token = "{frp_token}"
+user = \"{subdomain}\"
+metadatas.token = \"{frp_token}\"
 
 [[proxies]]
-name = "{subdomain}-ha"
-type = "http"
-localIP = "127.0.0.1"
+name = \"{subdomain}-ha\"
+type = \"http\"
+localIP = \"127.0.0.1\"
 localPort = {LOCAL_PROXY_PORT}
-subdomain = "{subdomain}"
-hostHeaderRewrite = "{UPSTREAM_HOST_HEADER}"
+subdomain = \"{subdomain}\"
+hostHeaderRewrite = \"{UPSTREAM_HOST_HEADER}\"
 """
     Path(FRPC_CONFIG).write_text(content, encoding="utf-8")
 
@@ -129,296 +129,467 @@ def index():
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RichPear Tunnel Setup</title>
+  <title>RichPear Home</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
     :root {
-      /* Directly bind to Home Assistant theme variables (updates with HA Light/Dark toggle). */
-      --bg-main: var(--primary-background-color, #fafbfa);
-      --bg-soft: var(--secondary-background-color, #f2f5f3);
-      --card: var(--card-background-color, #ffffff);
-      --line: var(--divider-color, #dde4e0);
-      --text: var(--primary-text-color, #062910);
-      --muted: var(--secondary-text-color, #687a70);
-      --primary: var(--primary-color, #004d29);
-      --primary-ink: var(--text-primary-color, #ffffff);
-      --ok: var(--success-color, #2aa766);
-      --ok-bg: color-mix(in srgb, var(--ok) 18%, var(--card) 82%);
-      --ok-line: color-mix(in srgb, var(--ok) 36%, var(--line) 64%);
-      --warn: var(--error-color, #b1222b);
-      --warn-bg: color-mix(in srgb, var(--warn) 15%, var(--card) 85%);
-      --warn-line: color-mix(in srgb, var(--warn) 34%, var(--line) 66%);
-      --input-bg: color-mix(in srgb, var(--card) 92%, var(--bg-soft) 8%);
-      --input-text: var(--text);
-      --input-line: color-mix(in srgb, var(--line) 86%, var(--text) 14%);
-      --focus-glow: color-mix(in srgb, var(--primary) 22%, transparent);
-      --radius: 14px;
+      color-scheme: light dark;
+      --bg-main: var(--primary-background-color, #0a1020);
+      --bg-elev: var(--secondary-background-color, #111827);
+      --card: var(--card-background-color, #141c2f);
+      --line: var(--divider-color, #2a3450);
+      --text: var(--primary-text-color, #e8edf7);
+      --muted: var(--secondary-text-color, #a8b4cd);
+      --primary: var(--primary-color, #19c37d);
+      --primary-ink: var(--text-primary-color, #03130d);
+      --ok: var(--success-color, #24c881);
+      --err: var(--error-color, #ef5350);
+      --focus: color-mix(in srgb, var(--primary) 35%, transparent);
+      --chip: color-mix(in srgb, var(--card) 78%, var(--bg-elev) 22%);
+      --shadow: 0 20px 45px rgba(2, 7, 20, 0.36);
     }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg-main: var(--primary-background-color, #f3f6fb);
+        --bg-elev: var(--secondary-background-color, #ebf0f8);
+        --card: var(--card-background-color, #ffffff);
+        --line: var(--divider-color, #d8e1ee);
+        --text: var(--primary-text-color, #101829);
+        --muted: var(--secondary-text-color, #5b6b85);
+        --primary: var(--primary-color, #0f8b5f);
+        --primary-ink: var(--text-primary-color, #ffffff);
+        --chip: color-mix(in srgb, var(--card) 55%, var(--bg-elev) 45%);
+        --shadow: 0 18px 35px rgba(15, 32, 66, 0.12);
+      }
+    }
+
     * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
     body {
       margin: 0;
-      font-family: 'Inter', system-ui, sans-serif;
       color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 8% 10%, rgba(0, 77, 41, 0.06), transparent 34%),
-        radial-gradient(circle at 88% 88%, rgba(20, 71, 43, 0.05), transparent 30%),
-        linear-gradient(165deg, var(--bg-main), var(--bg-soft));
-      min-height: 100vh;
+        radial-gradient(circle at 12% -10%, color-mix(in srgb, var(--primary) 13%, transparent), transparent 38%),
+        radial-gradient(circle at 90% 105%, color-mix(in srgb, var(--primary) 10%, transparent), transparent 35%),
+        linear-gradient(180deg, var(--bg-main), color-mix(in srgb, var(--bg-main) 76%, #000000 24%));
+      padding: 20px 14px 28px;
     }
-    .page {
-      max-width: 860px;
-      margin: 26px auto;
-      padding: 0 14px;
+
+    .shell {
+      max-width: 1080px;
+      margin: 0 auto;
     }
-    .hero {
-      background: linear-gradient(150deg, color-mix(in srgb, var(--card) 95%, #ffffff 5%), color-mix(in srgb, var(--card) 90%, var(--bg-soft) 10%));
-      color: var(--text);
-      border-radius: 16px;
+
+    .topbar {
       border: 1px solid var(--line);
-      box-shadow: 0 12px 28px rgba(10, 38, 22, 0.08);
-      padding: 20px;
-      margin-bottom: 14px;
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--card) 94%, var(--bg-elev) 6%);
+      box-shadow: var(--shadow);
+      padding: 12px 16px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
     }
+
     .brand {
-      font-family: 'Space Grotesk', sans-serif;
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: 700;
+      letter-spacing: 0.2px;
     }
-    .hero h1 { margin: 0 0 6px; font-size: 26px; line-height: 1.2; font-family: 'Space Grotesk', sans-serif; }
-    .hero p { margin: 0; color: var(--muted); font-size: 14px; }
+
     .brand-logo {
-      width: 36px;
-      height: 36px;
+      width: 28px;
+      height: 28px;
       object-fit: contain;
-      margin-right: 10px;
       flex: 0 0 auto;
     }
-    .meta {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 14px;
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    .meta-item {
-      background: color-mix(in srgb, var(--card) 92%, var(--bg-soft) 8%);
+
+    .nav-item {
+      display: inline-flex;
+      align-items: center;
       border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 13px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--chip);
     }
-    .meta-label { color: var(--muted); display: block; margin-bottom: 4px; }
-    .meta-value { font-weight: 700; word-break: break-word; }
+
+    .hero {
+      margin-bottom: 12px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(24px, 3.5vw, 34px);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .card {
+      background: color-mix(in srgb, var(--card) 96%, var(--bg-elev) 4%);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .kpi { grid-column: span 4; min-height: 118px; }
+    .panel { grid-column: 1 / -1; }
+
+    .label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .value {
+      font-size: 33px;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .value-sm {
+      font-size: 20px;
+      line-height: 1.2;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .sub {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     .status-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 10px;
+      border: 1px solid transparent;
       border-radius: 999px;
+      padding: 6px 10px;
       font-size: 12px;
       font-weight: 700;
-      border: 1px solid transparent;
     }
-    .up { background: var(--ok-bg); color: var(--ok); border-color: var(--ok-line); }
-    .down { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-line); }
-    .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 
-    .flash { margin: 10px 0; padding: 10px 12px; border-radius: 10px; font-size: 14px; }
-    .flash.ok { background: var(--ok-bg); border: 1px solid var(--ok-line); color: #0f5831; }
-    .flash.err { background: var(--warn-bg); border: 1px solid var(--warn-line); color: #7f1d1d; }
+    .up {
+      color: color-mix(in srgb, var(--ok) 92%, #ffffff 8%);
+      background: color-mix(in srgb, var(--ok) 20%, transparent);
+      border-color: color-mix(in srgb, var(--ok) 40%, var(--line) 60%);
+    }
 
-    .panel {
-      background: var(--card);
+    .down {
+      color: color-mix(in srgb, var(--err) 92%, #ffffff 8%);
+      background: color-mix(in srgb, var(--err) 16%, transparent);
+      border-color: color-mix(in srgb, var(--err) 34%, var(--line) 66%);
+    }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+    .flash {
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: 0 10px 24px rgba(12, 42, 24, 0.07);
-      padding: 16px;
-      margin-top: 14px;
+      font-size: 14px;
+      box-shadow: var(--shadow);
     }
-    .panel h3 {
-      margin: 0 0 10px;
-      font-size: 17px;
-      line-height: 1.25;
-      font-family: 'Space Grotesk', sans-serif;
+
+    .flash.ok {
+      color: color-mix(in srgb, var(--ok) 85%, var(--text) 15%);
+      background: color-mix(in srgb, var(--ok) 18%, var(--card) 82%);
+      border-color: color-mix(in srgb, var(--ok) 34%, var(--line) 66%);
     }
-    .muted { color: var(--muted); font-size: 13px; }
-    .auth-wrap {
-      max-width: 520px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: color-mix(in srgb, var(--card) 93%, var(--bg-soft) 7%);
-      padding: 14px;
+
+    .flash.err {
+      color: color-mix(in srgb, var(--err) 88%, var(--text) 12%);
+      background: color-mix(in srgb, var(--err) 14%, var(--card) 86%);
+      border-color: color-mix(in srgb, var(--err) 34%, var(--line) 66%);
     }
+
+    .stack { display: flex; flex-direction: column; gap: 10px; }
+
     .auth-tabs {
       display: inline-flex;
       gap: 6px;
-      background: color-mix(in srgb, var(--bg-soft) 86%, var(--card) 14%);
       border: 1px solid var(--line);
       border-radius: 999px;
       padding: 4px;
+      background: var(--chip);
       margin-bottom: 10px;
     }
+
     .auth-tab {
       border: 0;
       background: transparent;
-      color: #4f6859;
-      font-size: 13px;
-      font-weight: 700;
+      color: var(--muted);
       border-radius: 999px;
       padding: 7px 12px;
+      font-size: 13px;
+      font-weight: 700;
       cursor: pointer;
     }
+
     .auth-tab.active {
-      background: var(--card);
-      color: var(--primary);
-      box-shadow: 0 2px 8px rgba(12, 42, 24, 0.10);
+      color: var(--text);
+      background: color-mix(in srgb, var(--card) 90%, var(--bg-elev) 10%);
+      border: 1px solid var(--line);
     }
+
     .auth-form { display: none; }
     .auth-form.active { display: block; }
-    .auth-title { margin: 0 0 8px; font-size: 14px; color: #1f4a2d; font-weight: 700; }
-    .row { margin-bottom: 10px; }
-    input {
+
+    .field {
       width: 100%;
       border: 1px solid var(--line);
       border-radius: 10px;
+      background: color-mix(in srgb, var(--card) 74%, var(--bg-elev) 26%);
+      color: var(--text);
       padding: 11px 12px;
       font-size: 14px;
       outline: none;
       transition: border-color .15s ease, box-shadow .15s ease;
-      background: var(--input-bg);
-      color: var(--input-text);
-      border-color: var(--input-line);
     }
-    input:focus {
-      border-color: color-mix(in srgb, var(--primary) 70%, #ffffff 30%);
-      box-shadow: 0 0 0 4px var(--focus-glow);
+
+    .field::placeholder { color: color-mix(in srgb, var(--muted) 78%, transparent); }
+
+    .field:focus {
+      border-color: color-mix(in srgb, var(--primary) 70%, var(--line) 30%);
+      box-shadow: 0 0 0 3px var(--focus);
     }
+
     .btn {
-      border: 0;
+      border: 1px solid transparent;
       border-radius: 10px;
       padding: 10px 14px;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      color: var(--primary-ink);
-      background: var(--primary);
-      transition: transform .05s ease, filter .15s ease;
-      font-family: 'Space Grotesk', sans-serif;
+      transition: filter .15s ease, transform .05s ease;
     }
-    .btn:hover { filter: brightness(1.05); }
+
     .btn:active { transform: translateY(1px); }
-    .btn.secondary { background: #5f6c84; }
-    .btn.ok { background: var(--primary); }
-    .btn:disabled {
-      cursor: not-allowed;
-      filter: grayscale(.45);
-      opacity: .6;
+    .btn:hover { filter: brightness(1.05); }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    .btn.primary {
+      background: var(--primary);
+      color: var(--primary-ink);
+      border-color: color-mix(in srgb, var(--primary) 75%, #000000 25%);
     }
-    .row-inline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    .btn.ghost {
+      background: var(--chip);
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    .domain-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     .domain {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
       color: var(--primary);
       font-weight: 700;
-      background: color-mix(in srgb, var(--bg-soft) 82%, var(--card) 18%);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 4px 8px;
+      background: var(--chip);
+      white-space: nowrap;
     }
-    @media (max-width: 520px) { .meta { grid-template-columns: 1fr; } }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .device-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: color-mix(in srgb, var(--card) 92%, var(--bg-elev) 8%);
+    }
+
+    .muted { color: var(--muted); font-size: 13px; }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 28px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-title {
+      margin: 0 0 12px;
+      font-size: 24px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    @media (max-width: 980px) {
+      .kpi { grid-column: span 6; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      body { padding: 14px 10px 18px; }
+      .kpi { grid-column: 1 / -1; }
+      .section-title { font-size: 24px; }
+      .panel-title { font-size: 22px; }
+      .domain-wrap { flex-direction: column; align-items: stretch; }
+      .domain { text-align: center; }
+    }
   </style>
 </head>
 <body>
-  <div class="page">
-    <section class="hero">
-      <div style="display:flex; align-items:center; margin-bottom:8px;">
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
         <img src="rp-home.svg" alt="RichPear logo" class="brand-logo" />
-        <div>
-          <h1>RichPear Secure Tunnel</h1>
-          <p>Nastaveni pristupu z Home Assistanta do internetu.</p>
-        </div>
+        <span>RichPear Home</span>
       </div>
-      <div class="meta">
-        <div class="meta-item">
-          <span class="meta-label">Device ID</span>
-          <span class="meta-value">{{ device_id }}</span>
-        </div>
-        <div class="meta-item">
-          <span class="meta-label">Control plane</span>
-          <span class="meta-value">{{ control_plane_url }}</span>
-        </div>
-        <div class="meta-item">
-          <span class="meta-label">Stav tunelu</span>
-          {% if frpc_up %}<span class="status-pill up"><span class="dot"></span>Running</span>{% else %}<span class="status-pill down"><span class="dot"></span>Stopped</span>{% endif %}
-        </div>
-        <div class="meta-item">
-          <span class="meta-label">Aktivni domena</span>
-          <span class="meta-value">{% if state.get("full_domain") %}https://{{ state.get("full_domain") }}{% else %}-{% endif %}</span>
-        </div>
-      </div>
+      <nav class="nav">
+        <span class="nav-item">Prehled</span>
+        <span class="nav-item">Moje zarizeni</span>
+        <span class="nav-item">Subdomena</span>
+        <span class="nav-item">Ucet</span>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1 class="section-title">RichPear Secure Tunnel</h1>
+      <p>Nastaveni pristupu z Home Assistanta do internetu.</p>
     </section>
 
     {% if flash_ok %}<div class="flash ok">{{ flash_ok }}</div>{% endif %}
     {% if flash_err %}<div class="flash err">{{ flash_err }}</div>{% endif %}
 
-    <section class="panel">
-      <h3>Ucet zakaznika</h3>
-      {% if is_logged %}
-      <div class="flash ok">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status","-") }})</div>
-      {% else %}
-      <div class="auth-wrap">
-        <div class="auth-tabs">
-          <button type="button" class="auth-tab active" data-auth-tab="login">Prihlaseni</button>
-          <button type="button" class="auth-tab" data-auth-tab="signup">Registrace</button>
-        </div>
-        <form method="post" action="login" class="auth-form active" data-auth-form="login">
-          <p class="auth-title">Prihlas se do existujiciho uctu</p>
-          <div class="row"><input name="email" type="email" placeholder="E-mail" required /></div>
-          <div class="row"><input name="password" type="password" placeholder="Heslo" required /></div>
-          <button type="submit" class="btn">Prihlasit</button>
-        </form>
-        <form method="post" action="signup" class="auth-form" data-auth-form="signup">
-          <p class="auth-title">Vytvor novy ucet</p>
-          <div class="row"><input name="email" type="email" placeholder="E-mail" required /></div>
-          <div class="row"><input name="password" type="password" placeholder="Heslo (min 10, pismena + cisla)" required /></div>
-          <button type="submit" class="btn">Registrovat</button>
-        </form>
-      </div>
-      {% endif %}
-    </section>
+    <section class="grid">
+      <article class="card kpi">
+        <span class="label">Stav uctu</span>
+        <div class="value-sm">{% if is_logged %}{{ state.get("plan_status", "active") }}{% else %}neprihlasen{% endif %}</div>
+        <div class="sub">{% if state.get("email") %}{{ state.get("email") }}{% else %}-{% endif %}</div>
+      </article>
+      <article class="card kpi">
+        <span class="label">Zarizeni</span>
+        <div class="value">1</div>
+        <div class="sub">Home Assistant</div>
+      </article>
+      <article class="card kpi">
+        <span class="label">Subdomena</span>
+        <div class="value-sm">{% if state.get("subdomain") %}{{ state.get("subdomain") }}{% else %}-{% endif %}</div>
+        <div class="sub">{% if state.get("full_domain") %}https://{{ state.get("full_domain") }}{% else %}Nenastavena{% endif %}</div>
+      </article>
 
-    <section class="panel">
-      <h3>Subdomena a pripojeni</h3>
-      <form method="post" action="connect">
-        <div class="row-inline" style="margin-bottom:10px;">
-          <input style="flex:1; min-width:220px;" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
-          <span class="domain">.cz.richpear.cz</span>
+      <article class="card panel">
+        <h2 class="panel-title">Moje zarizeni</h2>
+        <div class="device-row">
+          <div>
+            <strong>{{ device_id }}</strong>
+            <div class="muted">Control plane: {{ control_plane_url }}</div>
+          </div>
+          {% if frpc_up %}<span class="status-pill up"><span class="dot"></span>Online</span>{% else %}<span class="status-pill down"><span class="dot"></span>Offline</span>{% endif %}
         </div>
-        <button type="submit" class="btn ok" {% if not is_logged %}disabled{% endif %}>Pripojit tunel</button>
-      </form>
-      {% if not is_logged %}
-      <p class="muted">Nejdriv se registruj nebo prihlas.</p>
-      {% endif %}
-      <form method="post" action="restart" style="margin-top:10px;">
-        <button type="submit" class="btn secondary">Restart tunelu</button>
-      </form>
+      </article>
+
+      <article class="card panel">
+        <h2 class="panel-title">Nastaveni uctu a tunelu</h2>
+        <div class="two-col">
+          <section class="stack">
+            <span class="label">Ucet zakaznika</span>
+            {% if is_logged %}
+            <div class="flash ok">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status","-") }})</div>
+            {% else %}
+            <div class="auth-tabs">
+              <button type="button" class="auth-tab active" data-auth-tab="login">Prihlaseni</button>
+              <button type="button" class="auth-tab" data-auth-tab="signup">Registrace</button>
+            </div>
+            <form method="post" action="login" class="auth-form active stack" data-auth-form="login">
+              <input class="field" name="email" type="email" placeholder="E-mail" required />
+              <input class="field" name="password" type="password" placeholder="Heslo" required />
+              <button type="submit" class="btn primary">Prihlasit</button>
+            </form>
+            <form method="post" action="signup" class="auth-form stack" data-auth-form="signup">
+              <input class="field" name="email" type="email" placeholder="E-mail" required />
+              <input class="field" name="password" type="password" placeholder="Heslo (min 10, pismena + cisla)" required />
+              <button type="submit" class="btn primary">Registrovat</button>
+            </form>
+            {% endif %}
+          </section>
+
+          <section class="stack">
+            <span class="label">Subdomena a pripojeni</span>
+            <form method="post" action="connect" class="stack">
+              <div class="domain-wrap">
+                <input class="field" style="flex:1; min-width:180px;" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
+                <span class="domain">.cz.richpear.cz</span>
+              </div>
+              <button type="submit" class="btn primary" {% if not is_logged %}disabled{% endif %}>Pripojit tunel</button>
+              {% if not is_logged %}<span class="muted">Nejdriv se registruj nebo prihlas.</span>{% endif %}
+            </form>
+            <form method="post" action="restart" style="margin-top:6px;">
+              <button type="submit" class="btn ghost">Restart tunelu</button>
+            </form>
+          </section>
+        </div>
+      </article>
     </section>
   </div>
+
   <script>
     (function () {
       var tabs = document.querySelectorAll('[data-auth-tab]');
       var forms = document.querySelectorAll('[data-auth-form]');
+
       function setMode(mode) {
-        tabs.forEach(function (t) {
-          t.classList.toggle('active', t.getAttribute('data-auth-tab') === mode);
+        tabs.forEach(function (tab) {
+          tab.classList.toggle('active', tab.getAttribute('data-auth-tab') === mode);
         });
-        forms.forEach(function (f) {
-          f.classList.toggle('active', f.getAttribute('data-auth-form') === mode);
+        forms.forEach(function (form) {
+          form.classList.toggle('active', form.getAttribute('data-auth-form') === mode);
         });
       }
+
       tabs.forEach(function (tab) {
         tab.addEventListener('click', function () {
           setMode(tab.getAttribute('data-auth-tab'));
         });
       });
 
-      // Home Assistant ingress can run in iframe where CSS vars are not always inherited.
-      // Sync theme vars from parent so addon always follows HA Light/Dark toggle.
       var THEME_VARS = [
         '--primary-background-color',
         '--secondary-background-color',
@@ -448,8 +619,7 @@ def index():
         for (var i = 0; i < candidates.length; i++) {
           var el = candidates[i];
           if (!el) continue;
-          var probe = firstNonEmptyVar(el, '--primary-background-color');
-          if (probe) return el;
+          if (firstNonEmptyVar(el, '--primary-background-color')) return el;
         }
         return doc.documentElement || null;
       }
@@ -461,17 +631,15 @@ def index():
           if (!src) return;
           THEME_VARS.forEach(function (name) {
             var val = firstNonEmptyVar(src, name);
-            if (val) {
-              document.documentElement.style.setProperty(name, val);
-            }
+            if (val) document.documentElement.style.setProperty(name, val);
           });
         } catch (e) {
-          // Fallback to local variables when parent document is inaccessible.
+          // Keep local light/dark fallbacks when parent styles are inaccessible.
         }
       }
 
       syncThemeFromParent();
-      setInterval(syncThemeFromParent, 1000);
+      setInterval(syncThemeFromParent, 1200);
     })();
   </script>
 </body>

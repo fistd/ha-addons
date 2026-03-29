@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.13
+
+- Redesigned add-on onboarding UI to match RichPear client dashboard style more closely (top bar, KPI cards, panel hierarchy, spacing).
+- Improved theme behavior with stronger light/dark fallbacks while still syncing Home Assistant theme variables from parent ingress context.
+- Kept onboarding flow simple: one auth block (Prihlaseni/Registrace tabs) plus direct subdomain/tunnel actions.
+
 ## 0.2.12
 
 - Fixed add-on header branding: replaced unintended Home Assistant icon with RichPear logo asset.
