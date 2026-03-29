@@ -201,7 +201,7 @@ def index():
       align-items: center;
       gap: 10px;
       font-weight: 700;
-      font-size: 28px;
+      font-size: 15px;
       letter-spacing: -0.01em;
     }
 
@@ -226,7 +226,7 @@ def index():
       color: var(--muted);
       border-radius: 999px;
       padding: 6px 11px;
-      font-size: 15px;
+      font-size: 13px;
       line-height: 1;
       white-space: nowrap;
     }
@@ -265,7 +265,7 @@ def index():
 
     .greet h1 {
       margin: 0;
-      font-size: 38px;
+      font-size: 42px;
       line-height: 1.08;
       letter-spacing: -0.02em;
     }
@@ -361,10 +361,10 @@ def index():
     .panel-h {
       padding: 14px 16px;
       border-bottom: 1px solid var(--line);
-      font-size: 34px;
+      font-size: 16px;
       line-height: 1;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
       margin: 0;
     }
 
@@ -432,6 +432,35 @@ def index():
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
+    }
+
+    .settings-wrap {
+      grid-column: 1 / -1;
+    }
+
+    .settings-details {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--card);
+      overflow: hidden;
+    }
+
+    .settings-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 12px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      border-bottom: 1px solid transparent;
+      user-select: none;
+    }
+
+    .settings-summary::-webkit-details-marker { display: none; }
+
+    .settings-details[open] .settings-summary {
+      color: var(--text);
+      border-bottom-color: var(--line);
     }
 
     .sub-title {
@@ -534,17 +563,17 @@ def index():
     @media (max-width: 980px) {
       .kpi { grid-column: span 6; }
       .settings-grid { grid-template-columns: 1fr; }
-      .brand { font-size: 20px; }
+      .brand { font-size: 15px; }
     }
 
     @media (max-width: 720px) {
       .container { width: min(1120px, calc(100% - 14px)); }
       .top-inner { min-height: 54px; }
-      .brand { font-size: 18px; }
+      .brand { font-size: 14px; }
       .brand img { width: 26px; height: 26px; }
       .kpi { grid-column: 1 / -1; }
-      .panel-h { font-size: 28px; }
-      .greet h1 { font-size: 30px; }
+      .panel-h { font-size: 16px; }
+      .greet h1 { font-size: 34px; }
       .domain { grid-template-columns: 1fr; }
       .user { width: 100%; justify-content: flex-end; }
     }
@@ -609,44 +638,46 @@ def index():
         </div>
       </article>
 
-      <article class="panel">
-        <h2 class="panel-h">Nastaveni uctu a tunelu</h2>
-        <div class="panel-b settings-grid">
-          <section class="stack">
-            <h3 class="sub-title">Ucet zakaznika</h3>
-            {% if is_logged %}
-              <div class="flash ok" style="margin:0;">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status", "-") }})</div>
-            {% else %}
-              <div class="auth-tabs">
-                <button type="button" class="auth-tab active" data-auth-tab="login">Prihlaseni</button>
-                <button type="button" class="auth-tab" data-auth-tab="signup">Registrace</button>
-              </div>
-              <form method="post" action="login" class="auth-form active stack" data-auth-form="login">
-                <input class="field" name="email" type="email" placeholder="E-mail" required />
-                <input class="field" name="password" type="password" placeholder="Heslo" required />
-                <button type="submit" class="btn primary">Prihlasit</button>
-              </form>
-              <form method="post" action="signup" class="auth-form stack" data-auth-form="signup">
-                <input class="field" name="email" type="email" placeholder="E-mail" required />
-                <input class="field" name="password" type="password" placeholder="Heslo (min 10, pismena + cisla)" required />
-                <button type="submit" class="btn primary">Registrovat</button>
-              </form>
-            {% endif %}
-          </section>
+      <article class="settings-wrap">
+        <details class="settings-details">
+          <summary class="settings-summary">Nastaveni uctu a tunelu</summary>
+          <div class="panel-b settings-grid">
+            <section class="stack">
+              <h3 class="sub-title">Ucet zakaznika</h3>
+              {% if is_logged %}
+                <div class="flash ok" style="margin:0;">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status", "-") }})</div>
+              {% else %}
+                <div class="auth-tabs">
+                  <button type="button" class="auth-tab active" data-auth-tab="login">Prihlaseni</button>
+                  <button type="button" class="auth-tab" data-auth-tab="signup">Registrace</button>
+                </div>
+                <form method="post" action="login" class="auth-form active stack" data-auth-form="login">
+                  <input class="field" name="email" type="email" placeholder="E-mail" required />
+                  <input class="field" name="password" type="password" placeholder="Heslo" required />
+                  <button type="submit" class="btn primary">Prihlasit</button>
+                </form>
+                <form method="post" action="signup" class="auth-form stack" data-auth-form="signup">
+                  <input class="field" name="email" type="email" placeholder="E-mail" required />
+                  <input class="field" name="password" type="password" placeholder="Heslo (min 10, pismena + cisla)" required />
+                  <button type="submit" class="btn primary">Registrovat</button>
+                </form>
+              {% endif %}
+            </section>
 
-          <section class="stack">
-            <h3 class="sub-title">Subdomena a pripojeni</h3>
-            <form method="post" action="connect" class="stack">
-              <div class="domain">
-                <input class="field" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
-                <span class="suffix">.cz.richpear.cz</span>
-              </div>
-              <button type="submit" class="btn primary" {% if not is_logged %}disabled{% endif %}>Pripojit tunel</button>
-              {% if not is_logged %}<span class="muted">Nejdriv se registruj nebo prihlas.</span>{% endif %}
-            </form>
-            <form method="post" action="restart" style="margin-top:8px;"><button type="submit" class="btn ghost">Restart tunelu</button></form>
-          </section>
-        </div>
+            <section class="stack">
+              <h3 class="sub-title">Subdomena a pripojeni</h3>
+              <form method="post" action="connect" class="stack">
+                <div class="domain">
+                  <input class="field" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
+                  <span class="suffix">.cz.richpear.cz</span>
+                </div>
+                <button type="submit" class="btn primary" {% if not is_logged %}disabled{% endif %}>Pripojit tunel</button>
+                {% if not is_logged %}<span class="muted">Nejdriv se registruj nebo prihlas.</span>{% endif %}
+              </form>
+              <form method="post" action="restart" style="margin-top:8px;"><button type="submit" class="btn ghost">Restart tunelu</button></form>
+            </section>
+          </div>
+        </details>
       </article>
     </section>
   </main>

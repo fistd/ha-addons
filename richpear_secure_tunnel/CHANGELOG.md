@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.16
+
+- Tuned addon dashboard visual parity with the client portal (header scale, nav chip sizing, greeting and section proportions).
+- Moved tunnel/account controls into a collapsed section so the default addon view matches the client dashboard layout more closely.
+
 ## 0.2.15
 
 - Rebuilt add-on page layout directly from the RichPear client dashboard structure (greeting block, KPI cards, dashboard proportions).
