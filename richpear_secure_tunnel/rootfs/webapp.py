@@ -589,16 +589,16 @@ def index():
     <div class="container top-inner">
       <div class="brand"><img src="rp-home.svg" alt="RichPear logo" />RichPear Home</div>
       <nav class="nav">
-        <a class="nav-item active" href="#overview" data-nav="overview">Prehled</a>
-        <a class="nav-item" href="#devices" data-nav="devices">Moje zarizeni</a>
-        <a class="nav-item" href="#settings" data-nav="subdomain">Subdomena</a>
-        <a class="nav-item" href="#settings" data-nav="account">Ucet</a>
-        <a class="nav-item" href="#settings" data-nav="billing">Fakturacni udaje</a>
+        <a class="nav-item active" href="#overview" data-nav="overview">Přehled</a>
+        <a class="nav-item" href="#devices" data-nav="devices">Moje zařízení</a>
+        <a class="nav-item" href="#settings" data-nav="subdomain">Subdoména</a>
+        <a class="nav-item" href="#settings" data-nav="account">Účet</a>
+        <a class="nav-item" href="#settings" data-nav="billing">Fakturační údaje</a>
       </nav>
       {% if is_logged %}
       <div class="user">
         <span>{{ state.get("email", "") }}</span>
-        <form method="post" action="logout" style="margin:0;"><button class="logout" type="submit">Odhlasit</button></form>
+        <form method="post" action="logout" style="margin:0;"><button class="logout" type="submit">Odhlásit</button></form>
       </div>
       {% endif %}
     </div>
@@ -606,8 +606,8 @@ def index():
 
   <main class="container main">
     <section class="greet" id="overview">
-      <h1>Ahoj, {% if state.get("email") %}{{ state.get("email").split("@")[0] }}{% else %}uzivateli{% endif %} 👋</h1>
-      <p>Prehled vaseho uctu a zarizeni.</p>
+      <h1>Ahoj, {% if state.get("email") %}{{ state.get("email").split("@")[0] }}{% else %}uživateli{% endif %} 👋</h1>
+      <p>Přehled vašeho účtu a zařízení.</p>
     </section>
 
     {% if flash_ok %}<div class="flash ok">{{ flash_ok }}</div>{% endif %}
@@ -615,23 +615,23 @@ def index():
 
     <section class="grid">
       <article class="kpi">
-        <div class="kpi-head"><span class="kpi-title">Stav uctu</span><span class="kpi-icon">◻</span></div>
+        <div class="kpi-head"><span class="kpi-title">Stav účtu</span><span class="kpi-icon">◻</span></div>
         <p class="kpi-value">{% if is_logged %}{{ state.get("plan_status", "active") }}{% else %}guest{% endif %}</p>
         <div class="kpi-sub">{% if state.get("email") %}{{ state.get("email") }}{% else %}—{% endif %}</div>
       </article>
       <article class="kpi">
-        <div class="kpi-head"><span class="kpi-title">Zarizeni</span><span class="kpi-icon">⌂</span></div>
+        <div class="kpi-head"><span class="kpi-title">Zařízení</span><span class="kpi-icon">⌂</span></div>
         <p class="kpi-value">1</p>
         <div class="kpi-sub">{% if frpc_up %}+1 1 online{% else %}0 online{% endif %}</div>
       </article>
       <article class="kpi">
-        <div class="kpi-head"><span class="kpi-title">Subdomena</span><span class="kpi-icon">◎</span></div>
+        <div class="kpi-head"><span class="kpi-title">Subdoména</span><span class="kpi-icon">◎</span></div>
         <p class="kpi-value">{% if state.get("subdomain") %}{{ state.get("subdomain") }}{% else %}—{% endif %}</p>
-        <div class="kpi-sub">{% if state.get("full_domain") %}{{ state.get("full_domain") }}{% else %}Nenastavena{% endif %}</div>
+        <div class="kpi-sub">{% if state.get("full_domain") %}{{ state.get("full_domain") }}{% else %}Nenastavená{% endif %}</div>
       </article>
 
       <article class="panel" id="devices">
-        <h2 class="panel-h">Moje zarizeni</h2>
+        <h2 class="panel-h">Moje zařízení</h2>
         <div class="panel-b">
           <div class="device-row">
             <div>
@@ -645,39 +645,39 @@ def index():
 
       <article class="settings-wrap" id="settings">
         <details class="settings-details">
-          <summary class="settings-summary">Nastaveni uctu a tunelu</summary>
+          <summary class="settings-summary">Nastavení účtu a tunelu</summary>
           <div class="panel-b settings-grid">
             <section class="stack">
-              <h3 class="sub-title">Ucet zakaznika</h3>
+              <h3 class="sub-title">Účet zákazníka</h3>
               {% if is_logged %}
-                <div class="flash ok" style="margin:0;">Prihlaseno jako <strong>{{ state.get("email") }}</strong> (plan: {{ state.get("plan_status", "-") }})</div>
+                <div class="flash ok" style="margin:0;">Přihlášeno jako <strong>{{ state.get("email") }}</strong> (plán: {{ state.get("plan_status", "-") }})</div>
               {% else %}
                 <div class="auth-tabs">
-                  <button type="button" class="auth-tab active" data-auth-tab="login">Prihlaseni</button>
+                  <button type="button" class="auth-tab active" data-auth-tab="login">Přihlášení</button>
                   <button type="button" class="auth-tab" data-auth-tab="signup">Registrace</button>
                 </div>
                 <form method="post" action="login" class="auth-form active stack" data-auth-form="login">
                   <input class="field" name="email" type="email" placeholder="E-mail" required />
                   <input class="field" name="password" type="password" placeholder="Heslo" required />
-                  <button type="submit" class="btn primary">Prihlasit</button>
+                  <button type="submit" class="btn primary">Přihlásit</button>
                 </form>
                 <form method="post" action="signup" class="auth-form stack" data-auth-form="signup">
                   <input class="field" name="email" type="email" placeholder="E-mail" required />
-                  <input class="field" name="password" type="password" placeholder="Heslo (min 10, pismena + cisla)" required />
+                  <input class="field" name="password" type="password" placeholder="Heslo (min. 10, písmena + čísla)" required />
                   <button type="submit" class="btn primary">Registrovat</button>
                 </form>
               {% endif %}
             </section>
 
             <section class="stack">
-              <h3 class="sub-title">Subdomena a pripojeni</h3>
+              <h3 class="sub-title">Subdoména a připojení</h3>
               <form method="post" action="connect" class="stack">
                 <div class="domain">
-                  <input id="subdomain-input" class="field" name="subdomain" type="text" placeholder="napr. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
+                  <input id="subdomain-input" class="field" name="subdomain" type="text" placeholder="např. rphome" value="{{ state.get('subdomain','') }}" required {% if not is_logged %}disabled{% endif %} />
                   <span class="suffix">.cz.richpear.cz</span>
                 </div>
-                <button type="submit" class="btn primary" {% if not is_logged %}disabled{% endif %}>Pripojit tunel</button>
-                {% if not is_logged %}<span class="muted">Nejdriv se registruj nebo prihlas.</span>{% endif %}
+                <button type="submit" class="btn primary" {% if not is_logged %}disabled{% endif %}>Připojit tunel</button>
+                {% if not is_logged %}<span class="muted">Nejdřív se registruj nebo přihlas.</span>{% endif %}
               </form>
               <form method="post" action="restart" style="margin-top:8px;"><button type="submit" class="btn ghost">Restart tunelu</button></form>
             </section>
@@ -807,7 +807,7 @@ def signup():
     state["access_token"] = data.get("access_token", "")
     state["plan_status"] = data.get("plan_status", "trial")
     save_state(state)
-    return ingress_redirect(ok="Ucet vytvoren a prihlasen")
+    return ingress_redirect(ok="Účet vytvořen a přihlášen")
 
 
 @APP.post("/login")
@@ -822,7 +822,7 @@ def login():
     state["access_token"] = data.get("access_token", "")
     state["plan_status"] = data.get("plan_status", "trial")
     save_state(state)
-    return ingress_redirect(ok="Prihlaseni probehlo uspesne")
+    return ingress_redirect(ok="Přihlášení proběhlo úspěšně")
 
 
 @APP.post("/logout")
@@ -831,7 +831,7 @@ def logout():
     state.pop("access_token", None)
     state.pop("plan_status", None)
     save_state(state)
-    return ingress_redirect(ok="Odhlaseni probehlo uspesne")
+    return ingress_redirect(ok="Odhlášení proběhlo úspěšně")
 
 
 @APP.post("/connect")
@@ -840,7 +840,7 @@ def connect():
     state = load_state()
     token = state.get("access_token", "")
     if not token:
-        return ingress_redirect(err="Nejdriv se prihlas nebo zaregistruj")
+        return ingress_redirect(err="Nejdřív se přihlas nebo zaregistruj")
     payload = {
         "device_id": load_device_id(),
         "subdomain": subdomain,
@@ -860,15 +860,15 @@ def connect():
     state["subdomain"] = subdomain
     state["full_domain"] = data.get("full_domain", "")
     save_state(state)
-    return ingress_redirect(ok=f"Tunel aktivni: {state.get('full_domain','')}")
+    return ingress_redirect(ok=f"Tunel aktivní: {state.get('full_domain','')}")
 
 
 @APP.post("/restart")
 def restart():
     if Path(FRPC_CONFIG).exists():
         restart_frpc()
-        return ingress_redirect(ok="Tunel restartovan")
-    return ingress_redirect(err="Konfigurace tunelu zatim neexistuje")
+        return ingress_redirect(ok="Tunel restartován")
+    return ingress_redirect(err="Konfigurace tunelu zatím neexistuje")
 
 
 if __name__ == "__main__":

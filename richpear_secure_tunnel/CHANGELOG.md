@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.18
+
+- Updated addon UI text to Czech with proper diacritics (navigation, section labels, action buttons, and status messages).
+- Updated success/error toast messages to Czech with diacritics as well.
+
 ## 0.2.17
 
 - Fixed top navigation to be truly functional in the addon UI (clickable section navigation and active tab state).
