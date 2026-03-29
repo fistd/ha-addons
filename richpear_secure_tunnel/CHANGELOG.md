@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.11
+
+- Improved visual parity with client portal: matching fonts (Inter/Space Grotesk), logo usage, and cleaner dashboard-like cards.
+- Add-on now serves the same rp-home.svg logo internally and uses it in onboarding header.
+
 ## 0.2.10
 
 - Fixed persistent login: add-on startup no longer overwrites onboarding_state.json and removes access_token during legacy auto-connect path.

@@ -7,7 +7,7 @@ import urllib.request
 import urllib.parse
 from pathlib import Path
 
-from flask import Flask, redirect, render_template_string, request, url_for
+from flask import Flask, redirect, render_template_string, request, send_file, url_for
 
 
 APP = Flask(__name__)
@@ -113,6 +113,11 @@ def ingress_redirect(ok: str = "", err: str = ""):
     return redirect(f"{base}/{query}" if base else f"/{query}")
 
 
+@APP.get("/rp-home.svg")
+def addon_logo():
+    return send_file("/opt/richpear/rp-home.svg", mimetype="image/svg+xml")
+
+
 @APP.get("/")
 def index():
     state = load_state()
@@ -126,6 +131,7 @@ def index():
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RichPear Tunnel Setup</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
     :root {
       /* Directly bind to Home Assistant theme variables (updates with HA Light/Dark toggle). */
       --bg-main: var(--primary-background-color, #fafbfa);
@@ -151,7 +157,7 @@ def index():
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: "Segoe UI", "Noto Sans", system-ui, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       color: var(--text);
       background:
         radial-gradient(circle at 8% 10%, rgba(0, 77, 41, 0.06), transparent 34%),
@@ -174,22 +180,17 @@ def index():
       margin-bottom: 14px;
     }
     .brand {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 34px;
-      height: 34px;
-      border-radius: 9px;
-      background: #ffffff;
-      border: 1px solid var(--line);
-      color: #ffffff;
-      font-weight: 800;
-      margin-right: 10px;
-      font-size: 13px;
-      color: var(--primary);
+      font-family: 'Space Grotesk', sans-serif;
     }
-    .hero h1 { margin: 0 0 6px; font-size: 26px; line-height: 1.2; }
+    .hero h1 { margin: 0 0 6px; font-size: 26px; line-height: 1.2; font-family: 'Space Grotesk', sans-serif; }
     .hero p { margin: 0; color: var(--muted); font-size: 14px; }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      margin-right: 10px;
+      flex: 0 0 auto;
+    }
     .meta {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -235,6 +236,7 @@ def index():
       margin: 0 0 10px;
       font-size: 17px;
       line-height: 1.25;
+      font-family: 'Space Grotesk', sans-serif;
     }
     .muted { color: var(--muted); font-size: 13px; }
     .auth-wrap {
@@ -298,6 +300,7 @@ def index():
       color: var(--primary-ink);
       background: var(--primary);
       transition: transform .05s ease, filter .15s ease;
+      font-family: 'Space Grotesk', sans-serif;
     }
     .btn:hover { filter: brightness(1.05); }
     .btn:active { transform: translateY(1px); }
@@ -324,7 +327,7 @@ def index():
   <div class="page">
     <section class="hero">
       <div style="display:flex; align-items:center; margin-bottom:8px;">
-        <span class="brand">RP</span>
+        <img src="rp-home.svg" alt="RichPear logo" class="brand-logo" />
         <div>
           <h1>RichPear Secure Tunnel</h1>
           <p>Nastaveni pristupu z Home Assistanta do internetu.</p>
