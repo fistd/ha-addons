@@ -2,6 +2,8 @@
 import json
 import os
 import subprocess
+import threading
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -169,6 +171,47 @@ def sync_state_from_control_plane(state: dict) -> dict:
     if changed:
         save_state(state)
     return state
+
+
+def send_device_heartbeat() -> None:
+    state = load_state()
+    token = str(state.get("access_token", ""))
+    if not token:
+        return
+    try:
+        device_id = load_device_id()
+    except Exception:
+        return
+    if not device_id:
+        return
+    code, data = api_post(
+        "/api/v2/public/devices/heartbeat",
+        {"device_id": device_id},
+        bearer_token=token,
+    )
+    if code == 200:
+        if state.get("heartbeat_error"):
+            state.pop("heartbeat_error", None)
+            save_state(state)
+        return
+    if code in (401, 403):
+        state.pop("access_token", None)
+        state["heartbeat_error"] = "Přihlášení vypršelo. Přihlas se znovu."
+        save_state(state)
+    elif code:
+        state["heartbeat_error"] = data.get("detail", f"Heartbeat selhal ({code})")
+        save_state(state)
+
+
+def heartbeat_loop() -> None:
+    while True:
+        send_device_heartbeat()
+        time.sleep(60)
+
+
+def start_heartbeat_thread() -> None:
+    t = threading.Thread(target=heartbeat_loop, name="rp-heartbeat", daemon=True)
+    t.start()
 
 
 def write_frpc_config(subdomain: str, frp_server: str, frp_port: int, frp_token: str) -> None:
@@ -1085,4 +1128,5 @@ def restart():
 
 
 if __name__ == "__main__":
+    start_heartbeat_thread()
     APP.run(host="0.0.0.0", port=8099)

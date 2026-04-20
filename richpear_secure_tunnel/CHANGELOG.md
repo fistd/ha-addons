@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.23
+
+- Add-on now sends a lightweight device heartbeat every 60 seconds while logged in, so Admin Console online/offline status reflects a running tunnel.
+
 ## 0.2.22
 
 - Add-on now refreshes account plan status from the control-plane on each dashboard load, so admin plan changes are reflected without logging out and back in.
