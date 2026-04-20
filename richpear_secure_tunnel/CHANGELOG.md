@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.22
+
+- Add-on now refreshes account plan status from the control-plane on each dashboard load, so admin plan changes are reflected without logging out and back in.
+- Add-on now refreshes the current device subdomain from the control-plane and rewrites/restarts `frpc` when an admin changes the subdomain.
+- Stored FRP connection details after first tunnel setup so later admin-side subdomain changes can be applied locally.
+
 ## 0.2.21
 
 - Renamed `Subdoména` to `Moje adresa` across addon dashboard navigation and cards.

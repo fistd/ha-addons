@@ -66,6 +66,111 @@ def api_post(path: str, payload: dict, bearer_token: str | None = None) -> tuple
         return 0, {"detail": str(e)}
 
 
+def api_get(path: str, bearer_token: str | None = None) -> tuple[int, dict]:
+    url = f"{CONTROL_PLANE_URL}{path}"
+    headers = {}
+    if bearer_token:
+        headers["Authorization"] = f"Bearer {bearer_token}"
+    req = urllib.request.Request(url, headers=headers, method="GET")
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            body = resp.read().decode("utf-8")
+            return resp.getcode(), json.loads(body) if body else {}
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", errors="ignore")
+        try:
+            return e.code, json.loads(body) if body else {}
+        except Exception:
+            return e.code, {"detail": body or f"HTTP {e.code}"}
+    except Exception as e:
+        return 0, {"detail": str(e)}
+
+
+def read_frpc_value(key: str) -> str:
+    p = Path(FRPC_CONFIG)
+    if not p.exists():
+        return ""
+    try:
+        for line in p.read_text(encoding="utf-8").splitlines():
+            stripped = line.strip()
+            if not stripped.startswith(f"{key} ="):
+                continue
+            return stripped.split("=", 1)[1].strip().strip('"')
+    except Exception:
+        return ""
+    return ""
+
+
+def current_frp_token(state: dict) -> str:
+    return str(state.get("frp_token") or read_frpc_value("metadatas.token") or "")
+
+
+def sync_state_from_control_plane(state: dict) -> dict:
+    token = str(state.get("access_token", ""))
+    if not token:
+        return state
+
+    changed = False
+    code, me = api_get("/api/v2/public/me", bearer_token=token)
+    if code == 200:
+        plan_status = str(me.get("plan_status", ""))
+        if plan_status and state.get("plan_status") != plan_status:
+            state["plan_status"] = plan_status
+            changed = True
+    elif code in (401, 403):
+        state.pop("access_token", None)
+        state.pop("plan_status", None)
+        state["sync_error"] = "Přihlášení vypršelo. Přihlas se znovu."
+        save_state(state)
+        return state
+    elif code:
+        state["sync_error"] = me.get("detail", f"Synchronizace účtu selhala ({code})")
+        changed = True
+
+    device_id = load_device_id()
+    code, devices_data = api_get("/api/v2/public/devices", bearer_token=token)
+    if code == 200:
+        devices = devices_data.get("devices", [])
+        current = None
+        if isinstance(devices, list):
+            for device in devices:
+                if not isinstance(device, dict):
+                    continue
+                if str(device.get("device_id", "")) == device_id:
+                    current = device
+                    break
+        if current:
+            remote_subdomain = str(current.get("subdomain", "")).strip().lower()
+            if remote_subdomain and state.get("subdomain") != remote_subdomain:
+                frp_token = current_frp_token(state)
+                frp_server = str(state.get("frp_server") or read_frpc_value("serverAddr") or "cz.richpear.cz")
+                frp_port = int(state.get("frp_port") or read_frpc_value("serverPort") or 7000)
+                if frp_token:
+                    write_frpc_config(
+                        subdomain=remote_subdomain,
+                        frp_server=frp_server,
+                        frp_port=frp_port,
+                        frp_token=frp_token,
+                    )
+                    restart_frpc()
+                    state.pop("sync_error", None)
+                else:
+                    state["sync_error"] = "Subdoména byla změněna, ale chybí lokální FRP token. Připoj tunel znovu."
+                state["subdomain"] = remote_subdomain
+                state["full_domain"] = f"{remote_subdomain}.cz.richpear.cz"
+                changed = True
+            if bool(current.get("is_active", True)) != state.get("device_active", True):
+                state["device_active"] = bool(current.get("is_active", True))
+                changed = True
+    elif code:
+        state["sync_error"] = devices_data.get("detail", f"Synchronizace zařízení selhala ({code})")
+        changed = True
+
+    if changed:
+        save_state(state)
+    return state
+
+
 def write_frpc_config(subdomain: str, frp_server: str, frp_port: int, frp_token: str) -> None:
     content = f"""serverAddr = \"{frp_server}\"
 serverPort = {frp_port}
@@ -121,6 +226,7 @@ def addon_logo():
 @APP.get("/")
 def index():
     state = load_state()
+    state = sync_state_from_control_plane(state)
     is_logged = bool(state.get("access_token"))
     email = str(state.get("email", ""))
     username = email.split("@")[0] if "@" in email else "uživateli"
@@ -884,7 +990,7 @@ def index():
         device_id=load_device_id(),
         frpc_up=frpc_running(),
         flash_ok=request.args.get("ok", ""),
-        flash_err=request.args.get("err", ""),
+        flash_err=request.args.get("err", "") or state.get("sync_error", ""),
         username=username,
         now=__import__("datetime").datetime.now().strftime("%d. %m. %Y %H:%M:%S"),
         subdomain_locked=bool(state.get("subdomain")),
@@ -902,6 +1008,8 @@ def signup():
     state["email"] = data.get("email", email)
     state["access_token"] = data.get("access_token", "")
     state["plan_status"] = data.get("plan_status", "trial")
+    state.pop("sync_error", None)
+    state = sync_state_from_control_plane(state)
     save_state(state)
     return ingress_redirect(ok="Účet vytvořen a přihlášen")
 
@@ -917,6 +1025,8 @@ def login():
     state["email"] = data.get("email", email)
     state["access_token"] = data.get("access_token", "")
     state["plan_status"] = data.get("plan_status", "trial")
+    state.pop("sync_error", None)
+    state = sync_state_from_control_plane(state)
     save_state(state)
     return ingress_redirect(ok="Přihlášení proběhlo úspěšně")
 
@@ -926,6 +1036,7 @@ def logout():
     state = load_state()
     state.pop("access_token", None)
     state.pop("plan_status", None)
+    state.pop("sync_error", None)
     save_state(state)
     return ingress_redirect(ok="Odhlášení proběhlo úspěšně")
 
@@ -957,6 +1068,10 @@ def connect():
     restart_frpc()
     state["subdomain"] = subdomain
     state["full_domain"] = data.get("full_domain", "")
+    state["frp_server"] = data.get("frp_server", "cz.richpear.cz")
+    state["frp_port"] = data.get("frp_port", 7000)
+    state["frp_token"] = data.get("frp_token", "")
+    state.pop("sync_error", None)
     save_state(state)
     return ingress_redirect(ok=f"Tunel aktivní: {state.get('full_domain','')}")
 
